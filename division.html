@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>TrebleChasers ODL | Divisions</title>
+
+  <link rel="stylesheet" href="./Css/styles.css" />
+  <script type="module" src="./Js/division.js"></script>
+</head>
+
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+
+    <a href="/" class="brand">
+      <img
+        src="./Assets/TrebleAssets/TrebleAssets_file_00000000564c72469e778dedad6ed082.png"
+        alt="TrebleChasers ODL"
+      />
+
+      <div class="brand-text">
+        <h1>TrebleChasers ODL</h1>
+        <span>Division Standings</span>
+      </div>
+    </a>
+
+    <div class="header-actions">
+      <select id="divisionSelectPublic"></select>
+
+      <button id="btnFixtures" class="gold-btn">
+        Fixtures
+      </button>
+
+      <button id="btnSubmit" class="gold-btn">
+        Submit Result
+      </button>
+
+      <button id="btnInbox" class="gold-btn">
+        Inbox
+        <span id="inboxCount">0</span>
+      </button>
+
+      <button id="btnPointsCalc" class="outline-btn">
+        Points Calculator
+      </button>
+    </div>
+
+  </div>
+</header>
+
+<main class="page-wrap">
+
+  <section class="hero-card">
+    <div class="hero-left">
+      <span class="eyebrow">
+        TREBLECHASERS ONLINE DARTS LEAGUE
+      </span>
+
+      <h2 id="divNameText">
+        Division 1
+      </h2>
+
+      <p>
+        Live division standings, fixtures, pending results,
+        averages, bonuses, and rankings.
+      </p>
+
+      <div class="hero-chips">
+        <div class="chip" id="seasonChip">
+          CURRENT SEASON
+        </div>
+
+        <div class="chip" id="matchesReqChip">
+          Best of 7
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section
+    id="activityCheckpointBox"
+    class="activity-box"
+    style="display:none;"
+  >
+    <div>
+      <strong>Activity Checkpoint</strong>
+      <p id="activityCheckpointText"></p>
+    </div>
+
+    <div id="activityCheckpointCount"></div>
+  </section>
+
+  <section class="table-card">
+
+    <div class="table-header">
+      <h3>Standings</h3>
+
+      <div id="updatedMeta"></div>
+    </div>
+
+    <div id="errorMeta" class="error-box"></div>
+
+    <div class="table-scroll">
+
+      <table class="standings-table">
+
+<thead>
+  <tr>
+    <th>#</th>
+    <th>Player</th>
+    <th>P</th>
+    <th>W</th>
+    <th>L</th>
+    <th>LF</th>
+    <th>LA</th>
+    <th>Diff</th>
+    <th>171+</th>
+    <th>100+ CO</th>
+    <th>Big Fish</th>
+    <th>Bulls</th>
+    <th>D-D</th>
+    <th>Avg</th>
+    <th>ELO</th>
+  </tr>
+</thead>
+
+        <tbody id="standingsBody"></tbody>
+
+      </table>
+
+    </div>
+  </section>
+
+  <!-- Fixtures Modal -->
+  <div id="fixturesModal" class="modal-overlay">
+
+    <div class="modal">
+
+      <button class="close">×</button>
+
+      <h3>My Fixtures</h3>
+
+      <div class="modal-meta">
+        Played:
+        <span id="fixturesCount">0 / 0</span>
+      </div>
+
+      <div id="fixturesList"></div>
+
+    </div>
+  </div>
+
+  <!-- Submit Result Modal -->
+  <div id="submitModal" class="modal-overlay">
+
+    <div class="modal large-modal">
+
+      <button class="close">×</button>
+
+      <h3>Submit Match Result</h3>
+
+      <div class="grid-2">
+
+        <div class="field">
+          <label>Opponent</label>
+          <select id="srOpponent"></select>
+        </div>
+
+        <div class="field">
+          <label>Your Legs</label>
+          <input id="srMyLegs" type="number" />
+        </div>
+
+        <div class="field">
+          <label>Opponent Legs</label>
+          <input id="srOppLegs" type="number" />
+        </div>
+
+      </div>
+
+      <h4>Your Stats</h4>
+
+      <div class="grid-3">
+
+        <input id="srMy171" type="number" placeholder="171+" />
+        <input id="srMy100" type="number" placeholder="100+ CO" />
+        <input id="srMyBigFish" type="number" placeholder="Big Fish 170" />
+        <input id="srMyBull" type="number" placeholder="Bull Finishes" />
+        <input id="srMyDD" type="number" placeholder="Double Double" />
+        <input id="srMyAvg" type="number" step="0.01" placeholder="Average" />
+
+      </div>
+
+      <h4>Opponent Stats</h4>
+
+      <div class="grid-3">
+
+        <input id="srOpp171" type="number" placeholder="171+" />
+        <input id="srOpp100" type="number" placeholder="100+ CO" />
+        <input id="srOppBigFish" type="number" placeholder="Big Fish 170" />
+        <input id="srOppBull" type="number" placeholder="Bull Finishes" />
+        <input id="srOppDD" type="number" placeholder="Double Double" />
+        <input id="srOppAvg" type="number" step="0.01" placeholder="Average" />
+
+      </div>
+
+      <div id="srNote" class="status err"></div>
+
+      <button id="srSubmitBtn" class="gold-btn">
+        Submit Match
+      </button>
+
+    </div>
+  </div>
+
+</main>
+
+</body>
+</html>

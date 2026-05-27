@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TrebleChasers • What's on</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root{
+      --bg:#0a0e12;
+      --panel:#10151b;
+      --panel2:#0f1317;
+      --cream:#f1e7d3;
+      --muted:#8d97a4;
+      --gold:#d7b46a;
+      --gold2:rgba(215,180,106,.18);
+      --border:rgba(215,180,106,.10);
+      --radius:16px;
+      --shadow:0 10px 28px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box;}
+    html,body{height:100%;}
+    body{
+      margin:0;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(215,180,106,.06), transparent 60%),
+        radial-gradient(circle at 90% 90%, rgba(27,124,87,.08), transparent 55%),
+        var(--bg);
+      color:var(--cream);
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+      min-height:100vh;
+    }
+
+    header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:12px 18px;
+      border-bottom:1px solid rgba(215,180,106,.12);
+      background:rgba(10,14,18,.75);
+      backdrop-filter:blur(6px);
+      position:sticky;
+      top:0;
+      z-index:30;
+    }
+
+    .title{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      font-family:"Bebas Neue", system-ui;
+      letter-spacing:.6px;
+      font-size:26px;
+    }
+    .chip{
+      background:rgba(215,180,106,.12);
+      border:1px solid rgba(215,180,106,.35);
+      border-radius:999px;
+      padding:2px 10px;
+      font-size:.65rem;
+      color:var(--gold);
+      font-family:Inter,system-ui;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+    }
+
+    .btn{
+      background:transparent;
+      border:1px solid rgba(241,231,211,.2);
+      color:var(--cream);
+      border-radius:10px;
+      padding:7px 10px;
+      cursor:pointer;
+      font-size:.75rem;
+      font-weight:700;
+    }
+    .btn:hover{ border-color: rgba(215,180,106,.35); background:rgba(215,180,106,.06); }
+    .btn.primary{
+      background:linear-gradient(180deg, #f0e3cf, #d9c090);
+      color:#101418;
+      border:0;
+    }
+
+    main{
+      max-width:1180px;
+      margin:16px auto 44px;
+      padding:0 14px;
+      display:grid;
+      gap:16px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap:16px;
+    }
+
+    .card{
+      background:rgba(16,21,27,.86);
+      border:1px solid rgba(215,180,106,.06);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(520px 180px at 20% 0%, rgba(215,180,106,.14), transparent 60%),
+        radial-gradient(620px 220px at 110% 120%, rgba(215,180,106,.08), transparent 55%);
+      opacity:.95;
+      pointer-events:none;
+    }
+    .card-inner{ position:relative; padding:14px; }
+
+    .section-title{
+      margin:0 0 8px 0;
+      font-family:"Bebas Neue", system-ui;
+      letter-spacing:.6px;
+      font-size:20px;
+      font-weight:400;
+      color:var(--cream);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .muted{ color:var(--muted); }
+    .small{ font-size:.78rem; }
+    .divider{
+      height:1px;
+      background:rgba(241,231,211,.06);
+      margin:12px 0;
+    }
+
+    /* Week calendar (single fixed view) */
+    .week{
+      display:grid;
+      grid-template-columns:repeat(7, minmax(0, 1fr));
+      gap:8px;
+      margin-top:8px;
+    }
+    .day{
+      border:1px solid rgba(215,180,106,.10);
+      border-radius:14px;
+      background:rgba(10,14,18,.35);
+      padding:10px 10px 9px;
+      cursor:pointer;
+      min-height:74px;
+      transition: transform .06s ease, border .12s ease, background .12s ease;
+    }
+    .day:hover{
+      transform:translateY(-1px);
+      border-color:rgba(215,180,106,.35);
+      background:rgba(215,180,106,.06);
+    }
+    .day .dow{
+      font-size:.68rem;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:rgba(241,231,211,.70);
+      margin-bottom:6px;
+      font-weight:800;
+    }
+    .day .date{
+      font-family:"Bebas Neue", system-ui;
+      font-size:22px;
+      letter-spacing:.4px;
+      line-height:1;
+    }
+    .day .tag{
+      margin-top:6px;
+      display:inline-flex;
+      border:1px solid rgba(215,180,106,.22);
+      background:rgba(215,180,106,.08);
+      color:var(--gold);
+      border-radius:999px;
+      padding:2px 8px;
+      font-size:.65rem;
+      font-weight:800;
+    }
+    .day.selected{
+      border-color:rgba(215,180,106,.5);
+      background:rgba(215,180,106,.08);
+    }
+    .day.tomorrow{
+      box-shadow: 0 0 0 1px rgba(215,180,106,.22), 0 0 26px rgba(215,180,106,.12);
+    }
+
+    /* Detail panel */
+    .detail-title{
+      display:flex;
+      gap:10px;
+      align-items:baseline;
+      flex-wrap:wrap;
+    }
+    .detail-title strong{
+      font-family:"Bebas Neue", system-ui;
+      font-size:26px;
+      letter-spacing:.6px;
+      font-weight:400;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(215,180,106,.25);
+      background:rgba(215,180,106,.08);
+      color:var(--cream);
+      font-size:.72rem;
+      font-weight:800;
+    }
+
+    ul{
+      margin:10px 0 0 18px;
+      padding:0;
+    }
+    li{ margin:6px 0; }
+    a{
+      color:var(--gold);
+      text-decoration:none;
+    }
+    a:hover{ text-decoration:underline; }
+
+    /* Modal */
+    .overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.55);
+      backdrop-filter:blur(5px);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:200;
+      padding:18px;
+    }
+    .overlay.open{ display:flex; }
+    .modal{
+      width:100%;
+      max-width:620px;
+      background:linear-gradient(180deg, rgba(23,29,36,.95), rgba(17,22,28,.95));
+      border:1px solid rgba(215,180,106,.28);
+      border-radius:18px;
+      box-shadow:0 18px 50px rgba(0,0,0,.6);
+      padding:14px;
+      position:relative;
+      overflow:hidden;
+    }
+    .modal::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background: radial-gradient(520px 180px at 20% 0%, rgba(215,180,106,.16), transparent 60%);
+      opacity:.95;
+      pointer-events:none;
+    }
+    .modal-inner{ position:relative; }
+    .modal-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:6px;
+    }
+    .modal-head h3{
+      margin:0;
+      font-family:"Bebas Neue", system-ui;
+      letter-spacing:.6px;
+      font-weight:400;
+      font-size:22px;
+    }
+    .modal p{ margin:8px 0; color:rgba(241,231,211,.85); }
+    .modal .note{ color:var(--muted); font-size:.82rem; }
+    @media (max-width: 900px){
+      .grid{ grid-template-columns:1fr; }
+      .week{ grid-template-columns:repeat(4, minmax(0, 1fr)); }
+    }
+    @media (max-width: 520px){
+      .week{ grid-template-columns:repeat(3, minmax(0, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="title">
+      What's on
+      <span class="chip" id="tomorrowChip">Tomorrow</span>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button class="btn" id="btnTournamentInfo" type="button">Tournament info</button>
+      <button class="btn" onclick="location.href='/'">Back</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="grid">
+      <!-- LEFT: calendar + details -->
+      <section class="card">
+        <div class="card-inner">
+          <div class="section-title">
+            This week
+            <span class="muted small" id="weekRange">—</span>
+          </div>
+
+          <div class="muted small">
+            Tap a day to see the schedule. (Simple fixed view — no month switching.)
+          </div>
+
+          <div class="week" id="weekGrid"></div>
+
+          <div class="divider"></div>
+
+          <div class="detail-title">
+            <strong id="detailDayName">—</strong>
+            <span class="pill" id="detailDatePill">—</span>
+          </div>
+
+          <div class="muted small" id="detailSubtitle" style="margin-top:6px;"></div>
+
+          <ul id="detailList"></ul>
+        </div>
+      </section>
+
+      <!-- RIGHT: useful links -->
+      <aside class="card">
+        <div class="card-inner">
+          <div class="section-title">Useful links</div>
+          <div class="muted small">Edit these inside <code>calendar.js</code>.</div>
+
+          <div class="divider"></div>
+
+          <div id="linksBox" class="small"></div>
+
+          <div class="divider"></div>
+
+          <div class="muted small">
+            Want this editable in-app later? We can store the schedule + links in Firestore and render here.
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- Tournament Info Modal -->
+  <div class="overlay" id="tOverlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-inner">
+        <div class="modal-head">
+          <h3>TrebleChasers Tournaments</h3>
+          <button class="btn" id="btnCloseModal" type="button">Close</button>
+        </div>
+
+        <p>
+          Treble Chasers at the beginning of each month uploads all tournaments for the month —
+          enter early to not be disappointed (only <strong>64</strong> per tournament).
+        </p>
+
+        <p class="note">
+          Search: <strong>TrebleChasersODL</strong>
+        </p>
+
+        <div class="divider"></div>
+
+        <p>
+          <strong>Wednesdays (19:00)</strong> — either the <strong>Open</strong> or the
+          <strong>DC 50+</strong> tournament.
+          If your average is below 50 but you fancy playing the big guns, you can still enter the Open.
+        </p>
+
+        <p>
+          <strong>Saturdays</strong> — two Opens:
+          <strong>11:00</strong> and <strong>18:00</strong>.
+        </p>
+
+        <div class="divider"></div>
+
+        <p class="note">
+          (These tournaments run on the external app — this page is just the “what’s on” guide.)
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/calendar.js"></script>
+</body>
+</html>
