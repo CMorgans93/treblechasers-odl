@@ -18,8 +18,8 @@ import {
   STARTING_ELO_BY_DIVISION,
   divisionValue,
   calculateEloChange,
-  updateStatsWithMatch,
-  emptyStats
+  updateModeStatsWithMatch,
+  emptyMatchStats
 } from "./elo-engine.js";
 
 const divisionSelect = document.getElementById("divisionSelectPublic");
@@ -86,11 +86,15 @@ function onlineDot(player) {
 }
 
 function getModeStats(player, mode = "freeLeague") {
-  if (player?.stats?.[mode]) return player.stats[mode];
-  if (player?.stats?.overall) return player.stats.overall;
+  if (player?.stats?.[mode]) {
+    return {
+      ...emptyMatchStats(),
+      ...player.stats[mode]
+    };
+  }
 
   return {
-    ...emptyStats(),
+    ...emptyMatchStats(),
     played: Number(player?.gamesPlayed || player?.played || 0),
     wins: Number(player?.wins || 0),
     draws: Number(player?.draws || 0),
@@ -107,8 +111,8 @@ function getModeStats(player, mode = "freeLeague") {
 }
 
 function sortPlayers(a, b) {
-  const sa = getModeStats(a);
-  const sb = getModeStats(b);
+  const sa = getModeStats(a, "freeLeague");
+  const sb = getModeStats(b, "freeLeague");
 
   const ptsA = sa.wins * 2 + sa.draws;
   const ptsB = sb.wins * 2 + sb.draws;
@@ -201,7 +205,7 @@ function renderDivision() {
   }
 
   playersInDivision.forEach((player, index) => {
-    const stats = getModeStats(player);
+    const stats = getModeStats(player, "freeLeague");
     const diff = stats.legsFor - stats.legsAgainst;
     const elo = Number(player.elo || player.starterElo || 0);
 
@@ -403,12 +407,12 @@ async function submitResult() {
   const oppLegs = Number(document.getElementById("srOppLegs")?.value);
 
   if (!opponentUid || !opponent) {
-    srNote.textContent = "Choose an opponent.";
+    if (srNote) srNote.textContent = "Choose an opponent.";
     return;
   }
 
   if (Number.isNaN(myLegs) || Number.isNaN(oppLegs)) {
-    srNote.textContent = "Enter both leg scores.";
+    if (srNote) srNote.textContent = "Enter both leg scores.";
     return;
   }
 
@@ -447,7 +451,8 @@ async function submitResult() {
     updatedAt: serverTimestamp()
   });
 
-  srNote.textContent = "Result submitted for confirmation.";
+  if (srNote) srNote.textContent = "Result submitted for confirmation.";
+
   await loadInboxCount();
 }
 
@@ -510,6 +515,7 @@ function renderInbox() {
 
 async function confirmPendingMatch(matchId) {
   const match = pendingInbox.find(item => item.id === matchId);
+
   if (!match) return;
 
   const p1 = allPlayers.find(player => player.uid === match.p1);
@@ -525,29 +531,15 @@ async function confirmPendingMatch(matchId) {
   const p1Change = calculateEloChange(p1, p2, match.p1Legs, match.p2Legs, mode);
   const p2Change = calculateEloChange(p2, p1, match.p2Legs, match.p1Legs, mode);
 
-  const p1StatsMode = updateStatsWithMatch(
+  const p1StatsMode = updateModeStatsWithMatch(
     getModeStats(p1, mode),
     match.p1Legs,
     match.p2Legs,
     match.p1Stats || {}
   );
 
-  const p2StatsMode = updateStatsWithMatch(
+  const p2StatsMode = updateModeStatsWithMatch(
     getModeStats(p2, mode),
-    match.p2Legs,
-    match.p1Legs,
-    match.p2Stats || {}
-  );
-
-  const p1StatsOverall = updateStatsWithMatch(
-    getModeStats(p1, "overall"),
-    match.p1Legs,
-    match.p2Legs,
-    match.p1Stats || {}
-  );
-
-  const p2StatsOverall = updateStatsWithMatch(
-    getModeStats(p2, "overall"),
     match.p2Legs,
     match.p1Legs,
     match.p2Stats || {}
@@ -558,14 +550,12 @@ async function confirmPendingMatch(matchId) {
 
   const p1Stats = {
     ...(p1.stats || {}),
-    [mode]: p1StatsMode,
-    overall: p1StatsOverall
+    [mode]: p1StatsMode
   };
 
   const p2Stats = {
     ...(p2.stats || {}),
-    [mode]: p2StatsMode,
-    overall: p2StatsOverall
+    [mode]: p2StatsMode
   };
 
   await setDoc(doc(db, "users", match.p1), {
