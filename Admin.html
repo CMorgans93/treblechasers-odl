@@ -26,7 +26,6 @@
       margin:20px auto 80px;
     }
 
-
     /* TOP */
 
     .top-banner{
@@ -598,6 +597,40 @@ players.forEach((player) => {
 loadPlayers();
 
 </script>
+<script>
+(function () {
+  const routes = {
+    "Players": "#players",
+    "Pending Results": "#pending-results",
+    "Divisions": "division.html",
+    "Season Controls": "#season-controls",
+    "Activity / Inactivity": "#activity",
+    "League Settings": "#league-settings"
+  };
 
+  document.querySelectorAll("button, .btn, .tile, .admin-btn, .menu-item").forEach((el) => {
+    const text = (el.textContent || "").trim();
+
+    Object.keys(routes).forEach((label) => {
+      if (text.includes(label)) {
+        el.style.cursor = "pointer";
+
+        el.addEventListener("click", () => {
+          const route = routes[label];
+
+          if (route.startsWith("#")) {
+            alert(`${label} section is loaded visually but not built as a live panel yet.`);
+            return;
+          }
+
+          window.location.href = route;
+        });
+      }
+    });
+  });
+
+  console.log("Admin click pathways loaded");
+})();
+</script>
 </body>
 </html>
