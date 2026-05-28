@@ -4,982 +4,485 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>TrebleChasers ODL</title>
+
   <meta
     name="description"
-    content="TrebleChasers Online Dart League — divisions, freeplay, tournaments, members prizes, and full ranking."
+    content="TrebleChasers Online Dart League — divisions, freeplay, tournaments, members prizes, profiles and live rankings."
   />
 
-  <!-- Fonts -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&display=swap"
-    rel="stylesheet"
-  />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
-    :root {
-      --bg-900:#0a0e12;
-      --bg-800:#11161c;
-      --bg-700:#171d24;
-      --cream:#f1e7d3;
-      --paper:#efe6d7;
-      --gold-500:#d7b46a;
-      --muted-400:#a7b0ba;
-      --muted-300:#798492;
-      --radius:18px;
-      --radius-lg:26px;
-      --shadow-soft:0 8px 24px rgba(0,0,0,.35);
-      --shadow-hard:0 12px 40px rgba(0,0,0,.5);
-      --danger:#ff6b6b;
+    :root{
+      --navy-950:#010814;
+      --navy-900:#031126;
+      --navy-800:#051a3b;
+      --navy-700:#08275c;
+      --gold:#f5c96a;
+      --gold-dark:#d7a93d;
+      --white:#ffffff;
+      --muted:rgba(255,255,255,.72);
+      --soft:rgba(255,255,255,.08);
+      --border:rgba(245,201,106,.16);
+      --radius:28px;
+      --shadow:0 24px 60px rgba(0,0,0,.5);
     }
 
-    *{box-sizing:border-box;}
-    html,body{height:100%;}
+    *{box-sizing:border-box}
+
     body{
       margin:0;
-      background:var(--bg-900);
-      color:var(--cream);
-      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
-      line-height:1.45;
-      background-image:
-        radial-gradient(1200px 800px at 75% -10%, rgba(215,180,106,.10), transparent 60%),
-        radial-gradient(900px 600px at 20% 110%, rgba(191,31,45,.12), transparent 60%),
-        radial-gradient(1200px 700px at -10% 10%, rgba(27,124,87,.10), transparent 55%);
-      background-attachment:fixed;
+      font-family:Inter,Arial,sans-serif;
+      color:white;
+      background:
+        radial-gradient(circle at top,#08275c 0%,#031126 45%,#010814 100%);
     }
 
-    .hidden{display:none !important;}
+    a{text-decoration:none;color:inherit}
 
-    /* header */
+    .hidden{display:none!important}
+
     header{
       position:sticky;
       top:0;
-      z-index:40;
-      background:linear-gradient(
-        to bottom,
-        rgba(10,14,18,.85),
-        rgba(10,14,18,.55) 60%,
-        transparent
-      );
-      border-bottom:1px solid rgba(215,180,106,.12);
-      backdrop-filter:saturate(140%) blur(8px);
+      z-index:50;
+      backdrop-filter:blur(10px);
+      background:rgba(1,8,20,.72);
+      border-bottom:1px solid var(--border);
     }
 
     .nav{
-      max-width:1280px;
+      width:min(1450px,94%);
       margin:0 auto;
-      padding:14px 24px;
+      padding:14px 0;
       display:flex;
       align-items:center;
-      gap:18px;
-      flex-wrap:wrap;
+      gap:14px;
     }
 
     .brand{
       display:flex;
       align-items:center;
-      gap:10px;
-      color:var(--cream);
-      text-decoration:none;
-      font-family:'Bebas Neue',system-ui;
-      font-size:20px;
-      letter-spacing:.6px;
-      font-weight:400;
+      gap:12px;
+      font-family:"Bebas Neue",sans-serif;
+      font-size:26px;
+      letter-spacing:.7px;
     }
+
     .brand img{
-      width:36px;
-      height:36px;
-      object-fit:cover;
-      border-radius:6px;
-      box-shadow:0 2px 8px rgba(0,0,0,.4);
+      width:44px;
+      height:44px;
+      object-fit:contain;
+      filter:drop-shadow(0 0 12px rgba(245,201,106,.18));
     }
 
-    .brand-wrap{
+    .spacer{flex:1}
+
+    .nav-actions{
       display:flex;
-      flex-direction:column;
-      align-items:flex-start;
-      gap:6px;
-      line-height:1.1;
-    }
-
-    .member-countdown{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:6px 10px;
-      border-radius:999px;
-      font-size:.72rem;
-      font-weight:700;
-      color:var(--cream);
-      border:1px solid rgba(215,180,106,.28);
-      background:rgba(215,180,106,.08);
-      box-shadow:
-        0 8px 22px rgba(0,0,0,.35),
-        0 0 18px rgba(215,180,106,.18);
-      position:relative;
-      overflow:hidden;
-    }
-
-    .member-countdown::before{
-      content:"";
-      position:absolute;
-      inset:-2px;
-      background:radial-gradient(420px 120px at 25% 0%, rgba(215,180,106,.28), transparent 60%);
-      opacity:.9;
-      pointer-events:none;
-    }
-
-    .member-countdown .muted-inline{ color:rgba(241,231,211,.65); font-weight:600; }
-    .member-countdown .danger-inline{ color:var(--danger); font-weight:900; }
-
-    .tile, .hero-card{
-      position:relative;
-      overflow:hidden;
-      box-shadow:
-        0 10px 26px rgba(0,0,0,.38),
-        0 0 0 1px rgba(215,180,106,.14),
-        0 0 26px rgba(215,180,106,.12);
-    }
-
-    .tile::before, .hero-card::before{
-      content:"";
-      position:absolute;
-      inset:-2px;
-      background:
-        radial-gradient(520px 180px at 20% 0%, rgba(215,180,106,.16), transparent 60%),
-        radial-gradient(620px 220px at 110% 120%, rgba(215,180,106,.10), transparent 55%);
-      opacity:.95;
-      pointer-events:none;
-    }
-
-    .tile:hover{
-      box-shadow:
-        0 14px 34px rgba(0,0,0,.42),
-        0 0 0 1px rgba(215,180,106,.22),
-        0 0 34px rgba(215,180,106,.18);
-    }
-
-    .spacer{flex:1 1 auto;}
-
-    .user-chip{
-      display:flex;
-      align-items:center;
       gap:10px;
       flex-wrap:wrap;
-      color:var(--cream);
-      font-size:.9rem;
-    }
-
-    .user-circle{
-      width:28px;
-      height:28px;
-      border-radius:999px;
-      background:#2a3139;
-      display:grid;
-      place-items:center;
-      font-weight:800;
-      font-size:.8rem;
-      color:var(--cream);
+      align-items:center;
     }
 
     .btn{
-      appearance:none;
-      border:0;
+      border:1px solid rgba(245,201,106,.24);
+      border-radius:16px;
+      padding:11px 15px;
+      font-weight:800;
       cursor:pointer;
-      font-weight:700;
-      border-radius:12px;
-      padding:8px 12px;
-      font-size:.8rem;
-      line-height:1.2;
-      transition:transform .06s ease, filter .2s ease, box-shadow .2s ease;
+      color:white;
+      background:linear-gradient(180deg,rgba(24,58,108,.88),rgba(8,30,66,.96));
+      box-shadow:0 10px 24px rgba(0,0,0,.25);
     }
-    .btn:active{transform:translateY(1px);}
 
-    .btn-primary{
-      color:#101418;
-      background:linear-gradient(180deg,var(--paper),#e9dcc4);
-      box-shadow:
-        inset 0 -1px 0 rgba(0,0,0,.25),
-        0 6px 18px rgba(0,0,0,.35);
+    .btn:hover{
+      border-color:rgba(245,201,106,.48);
+      transform:translateY(-1px);
     }
-    .btn-primary:hover{filter:brightness(1.03);}
 
-    .btn-ghost{
-      color:var(--cream);
-      background:transparent;
-      border:1px solid rgba(215,180,106,.35);
-    }
-    .btn-ghost:hover{
-      background:rgba(215,180,106,.08);
+    .btn.primary{
+      background:linear-gradient(180deg,var(--gold),var(--gold-dark));
+      color:#06142b;
     }
 
     .wrap{
-      max-width:1280px;
-      margin:0 auto;
-      padding:24px;
+      width:min(1450px,94%);
+      margin:24px auto 80px;
     }
 
-    /* hero area */
-    .hero-row{
+    .hero{
       display:grid;
-      grid-template-columns:minmax(360px, 480px) minmax(420px, 1fr);
-      gap:32px;
+      grid-template-columns:minmax(320px,520px) 1fr;
+      gap:22px;
       align-items:stretch;
     }
 
-    .hero-card{
+    .hero-card,
+    .logo-card,
+    .tile{
       background:
-        radial-gradient(circle at 0% 0%, rgba(191,31,45,.25) 0%, transparent 60%),
-        radial-gradient(circle at 100% 100%, rgba(27,124,87,.25) 0%, transparent 60%),
-        linear-gradient(180deg, rgba(23,29,36,.9), rgba(17,22,28,.9));
-      border:1px solid rgba(215,180,106,.18);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow-soft);
-      padding:20px 24px 24px;
-      max-width:480px;
+        linear-gradient(145deg,rgba(4,26,59,.96),rgba(5,18,38,.96));
+      border:1px solid var(--border);
+      border-radius:32px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .hero-card::before,
+    .logo-card::before,
+    .tile::before{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      background:
+        radial-gradient(500px 180px at 20% 0%,rgba(245,201,106,.15),transparent 60%),
+        radial-gradient(500px 220px at 100% 100%,rgba(195,32,38,.12),transparent 65%);
+      pointer-events:none;
+    }
+
+    .hero-card{
+      padding:34px;
     }
 
     .eyebrow{
-      color:var(--gold-500);
+      display:inline-block;
+      color:var(--gold);
       text-transform:uppercase;
-      font-weight:800;
-      letter-spacing:.14em;
-      font-size:.7rem;
-      line-height:1.4;
+      letter-spacing:.12em;
+      font-weight:900;
+      font-size:.75rem;
       margin-bottom:16px;
-      display:block;
-    }
-
-    .hero-headline{
-      font-family:'Bebas Neue',system-ui;
-      font-size:clamp(32px,4vw,44px);
-      line-height:1.1;
-      letter-spacing:.6px;
-      color:var(--cream);
-      margin:0 0 20px;
-      font-weight:400;
-    }
-
-    .hero-copy{
-      color:var(--cream);
-      font-size:.9rem;
-      line-height:1.5;
-      max-width:60ch;
-      margin:0 0 20px;
-    }
-
-    .hero-cta-row{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .hero-side{
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      gap:18px;
-      min-width:0;
-    }
-
-    .crest-col{
-      flex:1 1 auto;
-      display:flex;
-      align-items:flex-start;
-      justify-content:center;
-      width:100%;
-    }
-
-    .crest-col img{
-      width:260px;
-      max-width:80%;
-      height:auto;
-      display:block;
-      filter:drop-shadow(0 12px 24px rgba(0,0,0,.5));
-    }
-
-    .partner-tile{
-      width:100%;
-      min-height:132px;
-      display:flex;
-      align-items:center;
-      padding:16px 18px 14px;
-    }
-
-    .partner-tile-inner{
-      width:100%;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:18px;
-      flex-wrap:nowrap;
       position:relative;
       z-index:1;
     }
 
-    .partner-copy{
-      flex:1 1 auto;
-      min-width:0;
+    h1{
+      position:relative;
+      z-index:1;
+      margin:0;
+      font-family:"Bebas Neue",sans-serif;
+      font-size:clamp(46px,6vw,76px);
+      line-height:.95;
+      letter-spacing:1px;
     }
 
-    .partner-copy p{
-      margin:0 0 8px 0;
+    .hero-card p{
+      position:relative;
+      z-index:1;
+      color:var(--muted);
+      font-size:1rem;
+      line-height:1.6;
+      margin:18px 0 0;
+      max-width:60ch;
     }
 
-    .partner-logo{
-      flex:0 0 120px;
+    .hero-buttons{
+      position:relative;
+      z-index:1;
       display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:24px;
+    }
+
+    .logo-card{
+      min-height:360px;
+      display:flex;
+      flex-direction:column;
       align-items:center;
       justify-content:center;
-      min-width:120px;
+      padding:24px;
+      text-align:center;
     }
 
-    .partner-logo img{
-      width:100%;
-      max-width:110px;
-      max-height:90px;
-      height:auto;
-      display:block;
-      object-fit:contain;
-      filter:drop-shadow(0 10px 22px rgba(0,0,0,.45));
+    .logo-card img{
+      width:280px;
+      max-width:76%;
+      filter:
+        drop-shadow(0 18px 28px rgba(0,0,0,.45))
+        drop-shadow(0 0 18px rgba(245,201,106,.16));
+      position:relative;
+      z-index:1;
     }
 
-    /* tiles */
+    .partner{
+      margin-top:18px;
+      color:var(--muted);
+      position:relative;
+      z-index:1;
+    }
+
+    .partner strong{color:var(--gold)}
+
     .tiles{
+      margin-top:24px;
       display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(min(360px,100%),1fr));
-      gap:16px;
-      margin-top:32px;
+      grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr));
+      gap:18px;
     }
 
     .tile{
-      background:linear-gradient(180deg,rgba(23,29,36,.9),rgba(17,22,28,.9));
-      border:1px solid rgba(215,180,106,.15);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow-soft);
-      padding:16px 20px 14px;
-      color:var(--cream);
-      font-size:.9rem;
-      line-height:1.4;
-      min-height:120px;
-      transition:transform .05s ease, border .12s ease;
-    }
-    .tile:hover{
-      transform:translateY(-1px);
-      border:1px solid rgba(215,180,106,.4);
+      min-height:170px;
+      padding:22px;
       cursor:pointer;
+      transition:.18s ease;
+    }
+
+    .tile:hover{
+      transform:translateY(-2px);
+      border-color:rgba(245,201,106,.42);
+      box-shadow:
+        0 24px 60px rgba(0,0,0,.5),
+        0 0 24px rgba(245,201,106,.08);
     }
 
     .tile-head{
+      position:relative;
+      z-index:1;
       display:flex;
-      justify-content:space-between;
       align-items:flex-start;
-      flex-wrap:wrap;
-      gap:8px;
-      margin-bottom:8px;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:12px;
     }
 
-    .tile-head h3{
+    .tile h3{
       margin:0;
-      font-family:'Bebas Neue',system-ui;
-      letter-spacing:.6px;
-      font-size:20px;
-      line-height:1.1;
-      font-weight:400;
-      color:var(--cream);
+      font-family:"Bebas Neue",sans-serif;
+      font-size:30px;
+      letter-spacing:.7px;
+      line-height:1;
     }
 
     .chip{
-      border:1px solid rgba(215,180,106,.4);
-      border-radius:8px;
-      padding:4px 8px;
-      font-size:.7rem;
-      line-height:1.2;
-      color:var(--gold-500);
-      background:rgba(215,180,106,.08);
-      font-weight:600;
+      display:inline-flex;
+      align-items:center;
+      border:1px solid rgba(245,201,106,.32);
+      color:var(--gold);
+      background:rgba(245,201,106,.08);
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:.76rem;
+      font-weight:900;
       white-space:nowrap;
     }
 
     .tile p{
-      margin:0 0 6px 0;
-      color:var(--muted-400);
-      font-size:.88rem;
-      line-height:1.45;
+      position:relative;
+      z-index:1;
+      margin:0;
+      color:var(--muted);
+      line-height:1.5;
     }
 
     .metrics{
+      position:relative;
+      z-index:1;
+      margin-top:18px;
       display:flex;
       gap:12px;
       flex-wrap:wrap;
-      margin-top:4px;
     }
 
     .metric{
-      font-size:.7rem;
-      color:var(--muted-300);
-      display:flex;
-      flex-direction:column;
-      gap:2px;
+      min-width:96px;
+      padding:10px 12px;
+      border:1px solid rgba(255,255,255,.07);
+      border-radius:16px;
+      background:rgba(255,255,255,.04);
+    }
+
+    .metric span{
+      display:block;
+      font-size:.72rem;
+      color:rgba(255,255,255,.55);
+      margin-bottom:4px;
     }
 
     .metric strong{
+      color:white;
       font-size:.95rem;
-      color:var(--cream);
-      font-weight:600;
     }
 
     footer{
       text-align:center;
-      color:var(--muted-400);
-      font-size:.8rem;
-      line-height:1.4;
-      margin:48px 0 32px;
+      color:rgba(255,255,255,.55);
+      margin:42px 0 20px;
+      font-size:.85rem;
     }
 
-    /* modal */
-    .modal-overlay{
-      position:fixed;
-      inset:0;
-      background:rgba(10,14,18,.6);
-      backdrop-filter:blur(6px) saturate(120%);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index:80;
-    }
-    .modal-overlay.is-open{display:flex;}
-
-    .modal{
-      width:100%;
-      max-width:480px;
-      background:linear-gradient(180deg,rgba(23,29,36,.95),rgba(17,22,28,.95));
-      border:1px solid rgba(215,180,106,.2);
-      border-radius:18px;
-      box-shadow:var(--shadow-hard);
-      padding:20px;
-      color:var(--cream);
-    }
-
-    .modal header{
-      background:transparent;
-      border:0;
-      padding:0 0 8px 0;
-      margin:0 0 8px;
-    }
-
-    .modal h2{
-      margin:0;
-      font-family:'Bebas Neue',system-ui;
-      font-size:28px;
-      letter-spacing:.5px;
-      font-weight:400;
-      color:var(--cream);
-    }
-
-    .tabs{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:8px;
-      margin:8px 0 16px;
-    }
-
-    .tab{
-      border:1px solid rgba(215,180,106,.28);
-      background:#12171d;
-      color:var(--cream);
-      padding:10px 12px;
-      border-radius:10px;
-      text-align:center;
-      font-weight:800;
-      font-size:.8rem;
-      cursor:pointer;
-    }
-
-    .tab.active{
-      background:linear-gradient(180deg,var(--paper),#e9dcc4);
-      color:#0f1317;
-    }
-
-    .form-row{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      margin:10px 0;
-      color:var(--cream);
-    }
-
-    label{
-      font-size:.8rem;
-      color:var(--muted-400);
-    }
-
-    input[type="email"],
-    input[type="password"],
-    input[type="text"]{
-      background:#0f1419;
-      border:1px solid rgba(215,180,106,.25);
-      border-radius:10px;
-      padding:12px;
-      color:var(--cream);
-      font-size:.9rem;
-    }
-
-    .row-actions{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin-top:12px;
-      flex-wrap:wrap;
-    }
-
-    .error{
-      color:#ff6b6b;
-      min-height:1.2rem;
-      font-size:.9rem;
-      margin-top:6px;
-    }
-
-    @media(max-width:980px){
-      .hero-row{
-        grid-template-columns:1fr;
-        gap:24px;
-      }
-
-      .hero-card{
-        max-width:none;
-      }
-
-      .hero-side{
-        justify-content:flex-start;
-      }
-
-      .crest-col{
-        justify-content:flex-start;
-      }
-
-      .crest-col img{
-        width:200px;
-        max-width:60%;
-      }
-
-      .partner-tile{
-        width:100%;
-      }
-    }
-
-    @media(max-width:640px){
-      .partner-tile-inner{
-        flex-wrap:wrap;
-        align-items:flex-start;
-      }
-
-      .partner-logo{
-        justify-content:flex-start;
-      }
-    }
-
-    @media(max-width:560px){
-      .nav{padding:12px 16px;}
+    @media(max-width:900px){
+      .hero{grid-template-columns:1fr}
+      .nav{align-items:flex-start}
+      .brand span{font-size:22px}
+      .logo-card{min-height:260px}
+      .logo-card img{width:210px}
     }
   </style>
 </head>
 
 <body>
-  <!-- HEADER -->
-  <header>
-    <div class="nav">
-      <div class="brand-wrap">
-        <a class="brand" href="/" aria-label="TrebleChasers ODL home">
-          <img src="./Assets/TrebleAssets/TrebleAssets_file_00000000564c72469e778dedad6ed082.png" alt="TrebleChasers ODL crest" />
-          <span>TrebleChasers ODL</span>
-        </a>
 
-        <div id="memberCountdown" class="member-countdown hidden"></div>
-      </div>
+<header>
+  <div class="nav">
+    <a class="brand" href="./index.html">
+      <img src="./Assets/TrebleAssets/TrebleAssets_file_00000000564c72469e778dedad6ed082.png" alt="TrebleChasers ODL">
+      <span>TrebleChasers ODL</span>
+    </a>
 
-      <div class="spacer"></div>
+    <div class="spacer"></div>
 
-      <!-- when signed OUT -->
-      <div id="authButtons">
-        <button id="openLogin" class="btn btn-ghost" type="button">Log in</button>
-        <button id="openSignup" class="btn btn-primary" type="button">Sign up</button>
-      </div>
-
-      <!-- when signed IN -->
-      <div id="userArea" class="user-chip hidden">
-        <div class="user-circle" id="userInitial">U</div>
-        <span id="userName">User</span>
-
-        <a
-          id="adminBtn"
-          class="btn btn-ghost"
-          href="/admin.html"
-          style="display:none"
-        >
-          Admin
-        </a>
-
-        <button id="btnSignOut" class="btn btn-ghost" type="button">Sign out</button>
-      </div>
-    </div>
-  </header>
-
-  <!-- MAIN CONTENT -->
-  <main class="wrap">
-    <!-- HERO ROW -->
-    <section class="hero-row">
-      <div class="hero-card">
-        <span class="eyebrow">Premier Online Darts League</span>
-        <h1 class="hero-headline">
-          Play Divisions,<br />
-          Freeplay &<br />
-          Tournaments
-        </h1>
-
-        <p class="hero-copy">
-          Welcome to <strong>TrebleChasers ODL</strong> — a Ten-tier online darts
-          league organized via WhatsApp and scored on Target DartCounter. Join the
-          season, unlock Freeplay, and aim for the tournaments.
-        </p>
-
-        <div class="hero-cta-row">
-          <button id="ctaGetStarted" class="btn btn-primary" type="button">
-            Get Started
-          </button>
-          <button class="btn btn-ghost" type="button" id="btnRules">View Rules</button>
-        </div>
-      </div>
-
-      <div class="hero-side">
-        <div class="crest-col">
-<img src="./Assets/TrebleAssets/TrebleAssets_file_00000000564c72469e778dedad6ed082.png" alt="TrebleChasers ODL crest" />
-        </div>
-
-        <article class="tile partner-tile" id="partnerTile" role="button" tabindex="0">
-          <div class="partner-tile-inner">
-            <div class="partner-copy">
-              <div class="tile-head">
-                <h3>Stacked Barrels</h3>
-                <span class="chip">Partner</span>
-              </div>
-
-              <p>
-                Visit Stacked Barrels for darts equipment, accessories, and great products through our partnership.
-              </p>
-
-              <div class="metrics">
-                <div class="metric">
-                  <span>Partnership</span>
-                  <strong>Trusted</strong>
-                </div>
-                <div class="metric">
-                  <span>Website</span>
-                  <strong>Use Code TREBLE0 to get the league a kickback</strong>
-                </div>
-              </div>
-            </div>
-
-            <div class="partner-logo">
-             <img src="./Assets/TrebleAssets/TrebleAssets_IMG-20260315-WA0005(1).jpg" alt="Stacked Barrels logo" />
-            </div>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <!-- DASHBOARD TILES -->
-    <section class="tiles" style="margin-top:32px;">
-      <!-- DIVISION PLAY -->
-      <article class="tile" id="divisionTile" data-link="/division.html">
-        <div class="tile-head">
-          <h3>DIVISION PLAY</h3>
-          <span class="chip" id="seasonChip">Divisions</span>
-        </div>
-        <p id="seasonTileBody">
-          Best of 7 • one round-robin per division.
-        </p>
-        <div class="metrics" id="seasonMetrics">
-          <div class="metric">
-            <span>Avg</span>
-            <strong id="seasonAvg">—</strong>
-          </div>
-          <div class="metric">
-            <span>Matches</span>
-            <strong id="seasonMatches">— / —</strong>
-          </div>
-          <div class="metric">
-            <span>Remaining</span>
-            <strong id="seasonRemaining">—</strong>
-          </div>
-          <div class="metric">
-            <span>Div pos</span>
-            <strong id="seasonPosition">—</strong>
-          </div>
-        </div>
-      </article>
-      
-<article class="tile" id="paidDivisionsTile" data-link="/paid-divisions.html">
-  <div class="tile-head">
-    <h3>Paid Divisions League</h3>
-    <span class="chip">Paid</span>
-  </div>
-  <p>
-    Enter the paid divisions league and view fixtures, standings, and progress.
-  </p>
-  <div class="metrics">
-    <div class="metric">
-      <span>League</span>
-      <strong>Paid Entry</strong>
-    </div>
-    <div class="metric">
-      <span>Access</span>
-      <strong>Tap to open</strong>
+    <div class="nav-actions">
+      <a class="btn" href="./login.html">Log In</a>
+      <a class="btn primary" href="./signup.html">Sign Up</a>
     </div>
   </div>
-</article>
-      <!-- Open Ladder / Freeplay -->
-      <article class="tile" id="freeplayTile" data-link="/freeplay.html">
-        <div class="tile-head">
-          <h3>Open Ladder</h3>
-          <span class="chip" id="freeplayChip">Freeplay</span>
-        </div>
-        <p id="freeplayTileBody">
-          Unlock after 5 division matches or if you’re a member.
-        </p>
-        <div class="metrics">
-          <div class="metric">
-            <span>FP Avg</span>
-            <strong id="freeplayAvg">—</strong>
-          </div>
-          <div class="metric">
-            <span>FP Games</span>
-            <strong id="freeplayGames">—</strong>
-          </div>
-          <div class="metric">
-            <span>Ladder pos</span>
-            <strong id="freeplayRank">—</strong>
-          </div>
-        </div>
-      </article>
+</header>
 
-      <!-- Tournaments -->
-      <article class="tile" id="cupsTile" data-link="/tournaments.html">
-        <div class="tile-head">
-          <h3>Tournaments</h3>
-          <span class="chip" id="cupsChip">Tournaments</span>
-        </div>
-        <p id="cupsTileBody">
-          Submit your games for the DC tournaments. Hosted every Wednesday and Saturday.
-        </p>
-        <div class="metrics">
-          <div class="metric">
-            <span>T Avg</span>
-            <strong id="tournamentsAvg">—</strong>
-          </div>
-          <div class="metric">
-            <span>T Games</span>
-            <strong id="tournamentsGames">—</strong>
-          </div>
-          <div class="metric">
-            <span>T Points</span>
-            <strong id="tournamentsPoints">—</strong>
-          </div>
-        </div>
-      </article>
+<main class="wrap">
 
-      <!-- Overall Ranking -->
-      <article class="tile" id="rankingTile" data-link="/ranking.html">
-        <div class="tile-head">
-          <h3>Overall Ranking</h3>
-          <span class="chip">Live</span>
-        </div>
-        <p id="rankingTileBody">
-          Combined points from Division, Freeplay, Tournaments, + Members bonus.
-        </p>
-        <div class="metrics">
-          <div class="metric">
-            <span>Total points</span>
-            <strong id="totalPointsVal">—</strong>
-          </div>
-          <div class="metric">
-            <span>League pos</span>
-            <strong id="rankingPosVal">—</strong>
-          </div>
-        </div>
-      </article>
+  <section class="hero">
+    <article class="hero-card">
+      <span class="eyebrow">Premier Online Darts League</span>
 
-      <!-- Support the League (Amazon Affiliate) -->
-      <article class="tile" id="amazonTile" role="button" tabindex="0">
-        <div class="tile-head">
-          <h3>Support the League</h3>
-          <span class="chip">Amazon</span>
-        </div>
-        <p>
-          Use our Amazon link when you shop — we then earn a small commission at no extra cost to you.
-        </p>
-        <div class="metrics">
-          <div class="metric">
-            <span>Disclosure</span>
-            <strong>Tap to open</strong>
-          </div>
-          <div class="metric">
-            <span>No extra cost to you</span>
-          </div>
-        </div>
-      </article>
-    </section>
+      <h1>
+        Play Divisions,<br>
+        Freeplay &<br>
+        Tournaments
+      </h1>
 
-    <footer>
-      © <span id="year"></span> TrebleChasers ODL • Built for the darting community.
-    </footer>
-  </main>
-
-  <!-- AUTH MODAL -->
-  <div
-    id="authModal"
-    class="modal-overlay"
-    role="dialog"
-    aria-modal="true"
-    aria-hidden="true"
-  >
-    <div class="modal">
-      <header>
-        <h2>Welcome to TrebleChasers ODL</h2>
-      </header>
-
-      <div class="tabs">
-        <button id="tabLogin" class="tab active" type="button">Log in</button>
-        <button id="tabSignup" class="tab" type="button">Sign up</button>
-      </div>
-
-      <!-- LOGIN FORM -->
-      <form id="formLogin" autocomplete="on">
-        <div class="form-row">
-          <label for="loginEmail">Email</label>
-          <input id="loginEmail" type="email" required placeholder="you@example.com" autocomplete="email" />
-        </div>
-
-        <div class="form-row">
-          <label for="loginPassword">Password</label>
-          <input id="loginPassword" type="password" required placeholder="••••••••" autocomplete="current-password" minlength="6" />
-        </div>
-
-        <div class="row-actions">
-          <button class="btn btn-primary" type="submit">Log in</button>
-          <button id="linkForgot" class="btn btn-ghost" type="button">Forgot password</button>
-        </div>
-
-        <div id="loginError" class="error"></div>
-      </form>
-
-      <!-- SIGNUP FORM -->
-      <form id="formSignup" class="hidden" autocomplete="on">
-        <div class="form-row">
-          <label for="signupName">Display name</label>
-          <input id="signupName" type="text" required placeholder="Your name" autocomplete="name" />
-        </div>
-
-        <div class="form-row">
-          <label for="signupEmail">Email</label>
-          <input id="signupEmail" type="email" required placeholder="you@example.com" autocomplete="email" />
-        </div>
-
-        <div class="form-row">
-          <label for="signupPassword">Password</label>
-          <input id="signupPassword" type="password" minlength="6" required placeholder="At least 6 characters" autocomplete="new-password" />
-        </div>
-
-        <div class="row-actions">
-          <button class="btn btn-primary" type="submit">Create account</button>
-          <button id="closeModalA" class="btn btn-ghost" type="button">
-            Cancel
-          </button>
-        </div>
-
-        <div id="signupError" class="error"></div>
-      </form>
-
-      <div class="row-actions" style="justify-content:flex-end; margin-top:8px;">
-        <button id="closeModalB" class="btn btn-ghost" type="button">
-          Close
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Amazon Affiliate Modal -->
-  <div id="amazonModal" class="modal-overlay" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="amazonModalTitle">
-      <header>
-        <h2 id="amazonModalTitle">Support TrebleChasers</h2>
-      </header>
-
-      <p style="margin:0 0 12px 0;color:var(--cream);">
-        If you buy through this Amazon link, we then earn a small commission at no extra cost to you.
+      <p>
+        Welcome to <strong>TrebleChasers ODL</strong> — a live online darts platform for divisions,
+        tournaments, rankings, profiles, ELO movement, members events and more.
       </p>
 
-      <p style="margin:0 0 14px 0;color:var(--muted-400);">
-        <strong>As an Amazon Associate I earn from qualifying purchases.</strong>
-      </p>
-
-      <div class="row-actions" style="justify-content:space-between;">
-        <a
-          id="amazonAffiliateLink"
-          class="btn btn-primary"
-          href="https://amzn.to/3OjnYbr"
-          target="_blank"
-          rel="nofollow sponsored noopener"
-          style="text-decoration:none; display:inline-block;"
-        >
-          Open Amazon Link
-        </a>
-
-        <button id="amazonCloseBtn" class="btn btn-ghost" type="button">Close</button>
+      <div class="hero-buttons">
+        <a class="btn primary" href="./signup.html">Get Started</a>
+        <a class="btn" href="./division.html">Division Play</a>
+        <a class="btn" href="./tournaments.html">Tournaments</a>
       </div>
-    </div>
-  </div>
+    </article>
 
-  <script type="module" src="/rules.js"></script>
-  <script type="module" src="/app.js"></script>
+    <article class="logo-card">
+      <img src="./Assets/TrebleAssets/TrebleAssets_file_00000000564c72469e778dedad6ed082.png" alt="TrebleChasers ODL">
 
-  <script>
-    (function(){
-      const tile = document.getElementById('amazonTile');
-      const modal = document.getElementById('amazonModal');
-      const closeBtn = document.getElementById('amazonCloseBtn');
+      <div class="partner">
+        <strong>Stacked Barrels Partner</strong><br>
+        Use code <strong>TREBLE0</strong> to help support the league.
+      </div>
 
-      if (!tile || !modal || !closeBtn) return;
+      <div class="hero-buttons">
+        <a class="btn" href="https://stackedbarrels.com" target="_blank" rel="noopener noreferrer">Visit Partner</a>
+      </div>
+    </article>
+  </section>
 
-      function openModal(){
-        modal.classList.add('is-open');
-        modal.setAttribute('aria-hidden', 'false');
+  <section class="tiles">
+
+    <article class="tile" data-route="./division.html">
+      <div class="tile-head">
+        <h3>Division Play</h3>
+        <span class="chip">Divisions</span>
+      </div>
+      <p>Best of 7 league play, average-based divisions, live standings and monthly season structure.</p>
+      <div class="metrics">
+        <div class="metric"><span>Format</span><strong>BO7</strong></div>
+        <div class="metric"><span>Ranking</span><strong>ELO</strong></div>
+      </div>
+    </article>
+
+    <article class="tile" data-route="./tournaments.html">
+      <div class="tile-head">
+        <h3>Tournaments</h3>
+        <span class="chip">Cups</span>
+      </div>
+      <p>Elite Cup, Challenger Cup, Members Swiss, DC Tournaments and Admin Draft submissions.</p>
+      <div class="metrics">
+        <div class="metric"><span>Elite</span><strong>Top 32</strong></div>
+        <div class="metric"><span>Swiss</span><strong>Members</strong></div>
+      </div>
+    </article>
+
+    <article class="tile" data-route="./freeplay.html">
+      <div class="tile-head">
+        <h3>Open Ladder</h3>
+        <span class="chip">Freeplay</span>
+      </div>
+      <p>Flexible freeplay system with tracked games, ranking movement and career stats.</p>
+      <div class="metrics">
+        <div class="metric"><span>Access</span><strong>Unlocked</strong></div>
+        <div class="metric"><span>Stats</span><strong>Tracked</strong></div>
+      </div>
+    </article>
+
+    <article class="tile" data-route="./ranking.html">
+      <div class="tile-head">
+        <h3>Overall ELO</h3>
+        <span class="chip">Live</span>
+      </div>
+      <p>Combined live ranking table fed by divisions, tournaments, Swiss, draft and DC events.</p>
+      <div class="metrics">
+        <div class="metric"><span>Table</span><strong>Live</strong></div>
+        <div class="metric"><span>System</span><strong>ELO</strong></div>
+      </div>
+    </article>
+
+    <article class="tile" data-route="./player-profile.html">
+      <div class="tile-head">
+        <h3>Player Profiles</h3>
+        <span class="chip">Profiles</span>
+      </div>
+      <p>View career stats, ELO history, tournament records, averages and monthly snapshots.</p>
+      <div class="metrics">
+        <div class="metric"><span>Stats</span><strong>Career</strong></div>
+        <div class="metric"><span>History</span><strong>Monthly</strong></div>
+      </div>
+    </article>
+
+    <article class="tile" data-route="./Admin.html">
+      <div class="tile-head">
+        <h3>Admin Panel</h3>
+        <span class="chip">Admin</span>
+      </div>
+      <p>Manage players, divisions, results, settings, tournaments, members and season controls.</p>
+      <div class="metrics">
+        <div class="metric"><span>Control</span><strong>League</strong></div>
+        <div class="metric"><span>Access</span><strong>Admin</strong></div>
+      </div>
+    </article>
+
+  </section>
+
+  <footer>
+    © <span id="year"></span> TrebleChasers ODL • Built for the darting community.
+  </footer>
+
+</main>
+
+<script>
+(function(){
+  const year = document.getElementById("year");
+  if(year) year.textContent = new Date().getFullYear();
+
+  document.querySelectorAll("[data-route]").forEach((card)=>{
+    card.addEventListener("click",()=>{
+      window.location.href = card.getAttribute("data-route");
+    });
+
+    card.addEventListener("keydown",(e)=>{
+      if(e.key === "Enter" || e.key === " "){
+        e.preventDefault();
+        window.location.href = card.getAttribute("data-route");
       }
+    });
 
-      function closeModal(){
-        modal.classList.remove('is-open');
-        modal.setAttribute('aria-hidden', 'true');
-      }
+    card.setAttribute("tabindex","0");
+    card.setAttribute("role","button");
+  });
+})();
+</script>
 
-      tile.addEventListener('click', openModal);
-      tile.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          openModal();
-        }
-      });
-
-      closeBtn.addEventListener('click', closeModal);
-
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeModal();
-      });
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
-      });
-    })();
-  </script>
-  <script type="module" src="./Js/app.js"></script>
 </body>
 </html>
