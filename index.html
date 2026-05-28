@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TrebleChasers ODL</title>
+
+  <meta
+    name="description"
+    content="TrebleChasers Online Dart League — divisions, freeplay, tournaments, members prizes, profiles and live rankings."
+  />
+
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --navy-950:#010814;
+      --navy-900:#031126;
+      --navy-800:#051a3b;
+      --navy-700:#08275c;
+      --gold:#f5c96a;
+      --gold-dark:#d7a93d;
+      --white:#ffffff;
+      --muted:rgba(255,255,255,.72);
+      --soft:rgba(255,255,255,.08);
+      --border:rgba(245,201,106,.16);
+      --radius:28px;
+      --shadow:0 24px 60px rgba(0,0,0,.5);
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Inter,Arial,sans-serif;
+      color:white;
+      background:
+        radial-gradient(circle at top,#08275c 0%,#031126 45%,#010814 100%);
+    }
+
+    a{text-decoration:none;color:inherit}
+
+    .hidden{display:none!important}
+
+    header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      backdrop-filter:blur(10px);
+      background:rgba(1,8,20,.72);
+      border-bottom:1px solid var(--border);
+    }
+
+    .nav{
+      width:min(1450px,94%);
+      margin:0 auto;
+      padding:14px 0;
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-family:"Bebas Neue",sans-serif;
+      font-size:26px;
+      letter-spacing:.7px;
+    }
+
+    .brand img{
+      width:44px;
+      height:44px;
+      object-fit:contain;
+      filter:drop-shadow(0 0 12px rgba(245,201,106,.18));
+    }
+
+    .spacer{flex:1}
+
+    .nav-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .btn{
+      border:1px solid rgba(245,201,106,.24);
+      border-radius:16px;
+      padding:11px 15px;
+      font-weight:800;
+      cursor:pointer;
+      color:white;
+      background:linear-gradient(180deg,rgba(24,58,108,.88),rgba(8,30,66,.96));
+      box-shadow:0 10px 24px rgba(0,0,0,.25);
+    }
+
+    .btn:hover{
+      border-color:rgba(245,201,106,.48);
+      transform:translateY(-1px);
+    }
+
+    .btn.primary{
+      background:linear-gradient(180deg,var(--gold),var(--gold-dark));
+      color:#06142b;
+    }
+
+    .wrap{
+      width:min(1450px,94%);
+      margin:24px auto 80px;
+    }
+
+    .hero{
+      display:grid;
+      grid-template-columns:minmax(320px,520px) 1fr;
+      gap:22px;
+      align-items:stretch;
+    }
+
+    .hero-card,
+    .logo-card,
+    .tile{
+      background:
+        linear-gradient(145deg,rgba(4,26,59,.96),rgba(5,18,38,.96));
+      border:1px solid var(--border);
+      border-radius:32px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .hero-card::before,
+    .logo-card::before,
+    .tile::before{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      background:
+        radial-gradient(500px 180px at 20% 0%,rgba(245,201,106,.15),transparent 60%),
+        radial-gradient(500px 220px at 100% 100%,rgba(195,32,38,.12),transparent 65%);
+      pointer-events:none;
+    }
+
+    .hero-card{
+      padding:34px;
+    }
+
+    .eyebrow{
+      display:inline-block;
+      color:var(--gold);
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      font-weight:900;
+      font-size:.75rem;
+      margin-bottom:16px;
+      position:relative;
+      z-index:1;
+    }
+
+    h1{
+      position:relative;
+      z-index:1;
+      margin:0;
+      font-family:"Bebas Neue",sans-serif;
+      font-size:clamp(46px,6vw,76px);
+      line-height:.95;
+      letter-spacing:1px;
+    }
+
+    .hero-card p{
+      position:relative;
+      z-index:1;
+      color:var(--muted);
+      font-size:1rem;
+      line-height:1.6;
+      margin:18px 0 0;
+      max-width:60ch;
+    }
+
+    .hero-buttons{
+      position:relative;
+      z-index:1;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:24px;
+    }
+
+    .logo-card{
+      min-height:360px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      text-align:center;
+    }
+
+    .logo-card img{
+      width:280px;
+      max-width:76%;
+      filter:
+        drop-shadow(0 18px 28px rgba(0,0,0,.45))
+        drop-shadow(0 0 18px rgba(245,201,106,.16));
+      position:relative;
+      z-index:1;
+    }
+
+    .partner{
+      margin-top:18px;
+      color:var(--muted);
+      position:relative;
+      z-index:1;
+    }
+
+    .partner strong{color:var(--gold)}
+
+    .tiles{
+      margin-top:24px;
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr));
+      gap:18px;
+    }
+
+    .tile{
+      min-height:170px;
+      padding:22px;
+      cursor:pointer;
+      transition:.18s ease;
+    }
+
+    .tile:hover{
+      transform:translateY(-2px);
+      border-color:rgba(245,201,106,.42);
+      box-shadow:
+        0 24px 60px rgba(0,0,0,.5),
+        0 0 24px rgba(245,201,106,.08);
+    }
+
+    .tile-head{
+      position:relative;
+      z-index:1;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:12px;
+    }
+
+    .tile h3{
+      margin:0;
+      font-family:"Bebas Neue",sans-serif;
+      font-size:30px;
+      letter-spacing:.7px;
+      line-height:1;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      border:1px solid rgba(245,201,106,.32);
+      color:var(--gold);
+      background:rgba(245,201,106,.08);
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:.76rem;
+      font-weight:900;
+      white-space:nowrap;
+    }
+
+    .tile p{
+      position:relative;
+      z-index:1;
+      margin:0;
+      color:var(--muted);
+      line-height:1.5;
+    }
+
+    .metrics{
+      position:relative;
+      z-index:1;
+      margin-top:18px;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .metric{
+      min-width:96px;
+      padding:10px 12px;
+      border:1px solid rgba(255,255,255,.07);
+      border-radius:16px;
+      background:rgba(255,255,255,.04);
+    }
+
+    .metric span{
+      display:block;
+      font-size:.72rem;
+      color:rgba(255,255,255,.55);
+      margin-bottom:4px;
+    }
+
+    .metric strong{
+      color:white;
+      font-size:.95rem;
+    }
+
+    footer{
+      text-align:center;
+      color:rgba(255,255,255,.55);
+      margin:42px 0 20px;
+      font-size:.85rem;
+    }
+
+    @media(max-width:900px){
+      .hero{grid-template-columns:1fr}
+      .nav{align-items:flex-start}
+      .brand span{font-size:22px}
+      .logo-card{min-height:260px}
+      .logo-card img{width:210px}
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="nav">
+    <a class="brand" href="./index.html">
+      <img src="./Assets/TrebleAssets/TrebleAssets_file_00000000564c72469e778dedad6ed082.png" alt="TrebleChasers ODL">
+      <span>TrebleChasers ODL</span>
+    </a>
+
+    <div class="spacer"></div>
+
+    <div class="nav-actions">
+      <a class="btn" href="./login.html">Log In</a>
+      <a class="btn primary" href="./signup.html">Sign Up</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <article class="hero-card">
+      <span class="eyebrow">Premier Online Darts League</span>
+
+      <h1>
+        Play Divisions,<br>
+        Freeplay &<br>
+        Tournaments
+      </h1>
+
+      <p>
+        Welcome to <strong>TrebleChasers ODL</strong> — a live online darts platform for divisions,
+        tournaments, rankings, profiles, ELO movement, members events and more.
+      </p>
+
+      <div class="hero-buttons">
+        <a class="btn primary" href="./signup.html">Get Started</a>
+        <a class="btn" href="./division.html">Division Play</a>
+        <a class="btn" href="./tournaments.html">Tournaments</a>
+      </div>
+    </article>
+
+    <article class="logo-card">
+      <img src="./Assets/TrebleAssets/TrebleAssets_file_00000000564c72469e778dedad6ed082.png" alt="TrebleChasers ODL">
+
+      <div class="partner">
+        <strong>Stacked Barrels Partner</strong><br>
+        Use code <strong>TREBLE0</strong> to help support the league.
+      </div>
+
+      <div class="hero-buttons">
+        <a class="btn" href="https://stackedbarrels.com" target="_blank" rel="noopener noreferrer">Visit Partner</a>
+      </div>
+    </article>
+  </section>
+
+  <section class="tiles">
+
+    <article class="tile" data-route="./division.html">
+      <div class="tile-head">
+        <h3>Division Play</h3>
+        <span class="chip">Divisions</span>
+      </div>
+      <p>Best of 7 league play, average-based divisions, live standings and monthly season structure.</p>
+      <div class="metrics">
+        <div class="metric"><span>Format</span><strong>BO7</strong></div>
+        <div class="metric"><span>Ranking</span><strong>ELO</strong></div>
+      </div>
+    </article>
+
+    <article class="tile" data-route="./tournaments.html">
+      <div class="tile-head">
+        <h3>Tournaments</h3>
+        <span class="chip">Cups</span>
+      </div>
+      <p>Elite Cup, Challenger Cup, Members Swiss, DC Tournaments and Admin Draft submissions.</p>
+      <div class="metrics">
+        <div class="metric"><span>Elite</span><strong>Top 32</strong></div>
+        <div class="metric"><span>Swiss</span><strong>Members</strong></div>
+      </div>
+    </article>
+
+    <article class="tile" data-route="./freeplay.html">
+      <div class="tile-head">
+        <h3>Open Ladder</h3>
+        <span class="chip">Freeplay</span>
+      </div>
+      <p>Flexible freeplay system with tracked games, ranking movement and career stats.</p>
+      <div class="metrics">
+        <div class="metric"><span>Access</span><strong>Unlocked</strong></div>
+        <div class="metric"><span>Stats</span><strong>Tracked</strong></div>
+      </div>
+    </article>
+
+    <article class="tile" data-route="./ranking.html">
+      <div class="tile-head">
+        <h3>Overall ELO</h3>
+        <span class="chip">Live</span>
+      </div>
+      <p>Combined live ranking table fed by divisions, tournaments, Swiss, draft and DC events.</p>
+      <div class="metrics">
+        <div class="metric"><span>Table</span><strong>Live</strong></div>
+        <div class="metric"><span>System</span><strong>ELO</strong></div>
+      </div>
+    </article>
+
+    <article class="tile" data-route="./player-profile.html">
+      <div class="tile-head">
+        <h3>Player Profiles</h3>
+        <span class="chip">Profiles</span>
+      </div>
+      <p>View career stats, ELO history, tournament records, averages and monthly snapshots.</p>
+      <div class="metrics">
+        <div class="metric"><span>Stats</span><strong>Career</strong></div>
+        <div class="metric"><span>History</span><strong>Monthly</strong></div>
+      </div>
+    </article>
+
+    <article class="tile" data-route="./Admin.html">
+      <div class="tile-head">
+        <h3>Admin Panel</h3>
+        <span class="chip">Admin</span>
+      </div>
+      <p>Manage players, divisions, results, settings, tournaments, members and season controls.</p>
+      <div class="metrics">
+        <div class="metric"><span>Control</span><strong>League</strong></div>
+        <div class="metric"><span>Access</span><strong>Admin</strong></div>
+      </div>
+    </article>
+
+  </section>
+
+  <footer>
+    © <span id="year"></span> TrebleChasers ODL • Built for the darting community.
+  </footer>
+
+</main>
+
+<script>
+(function(){
+
+  // YEAR
+
+  const year = document.getElementById("year");
+
+  if(year){
+    year.textContent = new Date().getFullYear();
+  }
+
+  // TILE ROUTING
+
+  document.querySelectorAll("[data-route]").forEach((card)=>{
+
+    card.setAttribute("tabindex","0");
+    card.setAttribute("role","button");
+
+    function goToRoute(){
+
+      const route = card.getAttribute("data-route");
+
+      if(route){
+        window.location.href = route;
+      }
+
+    }
+
+    card.addEventListener("click", goToRoute);
+
+    card.addEventListener("keydown",(e)=>{
+
+      if(e.key === "Enter" || e.key === " "){
+        e.preventDefault();
+        goToRoute();
+      }
+
+    });
+
+  });
+
+  // HERO BUTTON ROUTING
+
+  const divisionBtn = document.querySelector('a[href="./division.html"]');
+
+  if(divisionBtn){
+
+    divisionBtn.addEventListener("click",(e)=>{
+      e.preventDefault();
+      window.location.href = "./division.html";
+    });
+
+  }
+
+  const tournamentBtn = document.querySelector('a[href="./tournaments.html"]');
+
+  if(tournamentBtn){
+
+    tournamentBtn.addEventListener("click",(e)=>{
+      e.preventDefault();
+      window.location.href = "./tournaments.html";
+    });
+
+  }
+
+  const signupBtn = document.querySelector('a[href="./signup.html"]');
+
+  if(signupBtn){
+
+    signupBtn.addEventListener("click",(e)=>{
+      e.preventDefault();
+      window.location.href = "./signup.html";
+    });
+
+  }
+
+  const loginBtn = document.querySelector('a[href="./login.html"]');
+
+  if(loginBtn){
+
+    loginBtn.addEventListener("click",(e)=>{
+      e.preventDefault();
+      window.location.href = "./login.html";
+    });
+
+  }
+
+  console.log("TrebleChasers routing loaded successfully.");
+
+})();
+</script>
+
+</body>
+</html>
