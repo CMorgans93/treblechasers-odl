@@ -74,19 +74,38 @@ const partnerTile          = document.getElementById('partnerTile');
 const paidDivisionsTile    = document.getElementById('paidDivisionsTile');
 
 // ---------- generic tile navigation ----------
-document.querySelectorAll('[data-link]').forEach(tile => {
+document.querySelectorAll('[data-link], [data-route]').forEach(tile => {
+
   tile.addEventListener('click', () => {
-    const href = tile.getAttribute('data-link');
-    if (href) window.location.href = href;
+
+    const href =
+      tile.getAttribute('data-link') ||
+      tile.getAttribute('data-route');
+
+    if (href){
+      window.location.href = href;
+    }
+
   });
 
   tile.addEventListener('keydown', (e) => {
+
     if (e.key === 'Enter' || e.key === ' ') {
+
       e.preventDefault();
-      const href = tile.getAttribute('data-link');
-      if (href) window.location.href = href;
+
+      const href =
+        tile.getAttribute('data-link') ||
+        tile.getAttribute('data-route');
+
+      if (href){
+        window.location.href = href;
+      }
+
     }
+
   });
+
 });
 
 // ---------- partner tile ----------
@@ -799,7 +818,7 @@ ctaGetStarted?.addEventListener('click', () => {
     showSignup();
     openModal();
   } else {
-    window.location.href = '/division.html';
+window.location.href = '/pages/division.html';
   }
 });
 
