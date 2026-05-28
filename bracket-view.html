@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>TrebleChasers ODL | Bracket View</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Inter,Arial,sans-serif;
+      color:white;
+      background:radial-gradient(circle at top,#08275c 0%,#031126 45%,#010814 100%);
+    }
+
+    a{text-decoration:none;color:inherit}
+
+    .wrap{
+      width:min(1450px,94%);
+      margin:24px auto 80px;
+    }
+
+    .top,
+    .panel,
+    .round-card,
+    .match-card{
+      background:linear-gradient(145deg,rgba(4,26,59,.96),rgba(5,18,38,.96));
+      border:1px solid rgba(245,201,106,.16);
+      border-radius:28px;
+      box-shadow:0 24px 60px rgba(0,0,0,.45);
+    }
+
+    .top{
+      padding:24px;
+      margin-bottom:22px;
+      display:flex;
+      gap:18px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+
+    .brand{
+      display:flex;
+      gap:14px;
+      align-items:center;
+    }
+
+    .brand img{
+      width:58px;
+      height:58px;
+      object-fit:contain;
+    }
+
+    .brand h1{
+      margin:0;
+      font-family:"Bebas Neue",sans-serif;
+      font-size:42px;
+      letter-spacing:.8px;
+      line-height:1;
+    }
+
+    .brand span{
+      color:rgba(255,255,255,.66);
+      font-weight:700;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:1px solid rgba(245,201,106,.28);
+      background:linear-gradient(180deg,rgba(24,58,108,.88),rgba(8,30,66,.96));
+      color:white;
+      padding:12px 16px;
+      border-radius:16px;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    .btn.primary{
+      background:linear-gradient(180deg,#f5c96a,#d7a93d);
+      color:#06142b;
+    }
+
+    .hero{
+      padding:28px;
+      margin-bottom:22px;
+      border-radius:32px;
+      background:linear-gradient(145deg,rgba(4,26,59,.96),rgba(5,18,38,.96));
+      border:1px solid rgba(245,201,106,.16);
+      box-shadow:0 24px 60px rgba(0,0,0,.45);
+    }
+
+    .eyebrow{
+      color:#f5c96a;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      font-size:.8rem;
+      font-weight:900;
+    }
+
+    #tournamentTitle{
+      margin:10px 0 8px;
+      font-family:"Bebas Neue",sans-serif;
+      font-size:clamp(44px,7vw,78px);
+      line-height:.95;
+      letter-spacing:1px;
+    }
+
+    #tournamentMeta{
+      color:rgba(255,255,255,.72);
+      line-height:1.5;
+      margin:0;
+    }
+
+    .chips{
+      margin-top:18px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      border:1px solid rgba(245,201,106,.32);
+      color:#f5c96a;
+      background:rgba(245,201,106,.08);
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:.8rem;
+      font-weight:900;
+      white-space:nowrap;
+    }
+
+    .panel{
+      padding:24px;
+      margin-bottom:22px;
+    }
+
+    .panel h2{
+      margin:0 0 16px;
+      color:#f5c96a;
+      font-size:28px;
+      font-family:"Bebas Neue",sans-serif;
+      letter-spacing:.7px;
+    }
+
+    .bracket-scroll{
+      overflow-x:auto;
+      padding-bottom:10px;
+    }
+
+    .bracket{
+      display:grid;
+      grid-auto-flow:column;
+      grid-auto-columns:minmax(280px,340px);
+      gap:18px;
+      align-items:start;
+      min-height:260px;
+    }
+
+    .round-card{
+      padding:16px;
+      min-height:220px;
+    }
+
+    .round-card h3{
+      margin:0 0 14px;
+      color:#f5c96a;
+      font-size:22px;
+      font-family:"Bebas Neue",sans-serif;
+      letter-spacing:.6px;
+    }
+
+    .match-card{
+      padding:14px;
+      margin-bottom:12px;
+      box-shadow:none;
+      border-radius:18px;
+      background:linear-gradient(180deg,rgba(15,40,82,.9),rgba(7,24,52,.96));
+    }
+
+    .match-top{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+      margin-bottom:10px;
+      color:rgba(255,255,255,.55);
+      font-size:.78rem;
+      font-weight:800;
+    }
+
+    .player-row{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:12px;
+      padding:10px;
+      border-radius:14px;
+      margin-top:7px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.06);
+    }
+
+    .player-row.winner{
+      border-color:rgba(245,201,106,.5);
+      background:rgba(245,201,106,.1);
+    }
+
+    .player-name{
+      font-weight:900;
+    }
+
+    .score{
+      color:#f5c96a;
+      font-weight:900;
+    }
+
+    .status{
+      display:inline-flex;
+      padding:5px 8px;
+      border-radius:999px;
+      font-size:.72rem;
+      font-weight:900;
+      border:1px solid rgba(255,255,255,.16);
+      color:rgba(255,255,255,.72);
+    }
+
+    .status.ready{color:#f5c96a;border-color:rgba(245,201,106,.35)}
+    .status.complete{color:#72e29c;border-color:rgba(114,226,156,.35)}
+    .status.pending{color:#ffcf75;border-color:rgba(255,207,117,.35)}
+
+    .empty{
+      color:rgba(255,255,255,.64);
+      padding:16px;
+      border-radius:18px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    @media(max-width:760px){
+      .top{
+        align-items:flex-start;
+      }
+
+      .brand h1{
+        font-size:34px;
+      }
+
+      .bracket{
+        grid-auto-columns:minmax(260px,88vw);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<main class="wrap">
+
+  <section class="top">
+    <div class="brand">
+      <img
+        src="../Assets/TrebleAssets/TrebleAssets_file_00000000564c72469e778dedad6ed082.png"
+        alt="TrebleChasers ODL"
+      >
+
+      <div>
+        <h1>TrebleChasers ODL</h1>
+        <span>Live Bracket View</span>
+      </div>
+    </div>
+
+    <div class="actions">
+      <a class="btn" href="../index.html">Home</a>
+      <a class="btn" href="./tournaments.html">Tournaments</a>
+      <a class="btn primary" href="./Admin.html">Admin Panel</a>
+    </div>
+  </section>
+
+  <section class="hero">
+    <span class="eyebrow">Tournament Bracket</span>
+
+    <h2 id="tournamentTitle">Loading Bracket...</h2>
+
+    <p id="tournamentMeta">
+      Loading tournament details from Firebase.
+    </p>
+
+    <div class="chips">
+      <span class="chip" id="statusChip">Status</span>
+      <span class="chip" id="playersChip">Players</span>
+      <span class="chip" id="progressChip">Progress</span>
+      <span class="chip" id="championChip">Champion: —</span>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Bracket</h2>
+
+    <div id="errorMeta" class="empty" style="display:none;"></div>
+
+    <div class="bracket-scroll">
+      <div id="bracketRoot" class="bracket">
+        <div class="empty">Loading bracket...</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script type="module" src="../Js/tournaments/bracket-view.js"></script>
+
+</body>
+</html>
