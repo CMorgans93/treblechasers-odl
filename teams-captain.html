@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Captain Tools • Treble Teams League</title>
+  <meta name="description" content="Captain tools — set session lineups and publish to players." />
+
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+
+  <style>
+    :root{
+      --bg-900:#0a0e12; --bg-800:#11161c; --bg-700:#171d24;
+      --cream:#f1e7d3; --paper:#efe6d7; --gold-500:#d7b46a;
+      --muted-400:#a7b0ba; --muted-300:#798492;
+      --radius:18px; --radius-lg:26px;
+      --shadow-soft:0 8px 24px rgba(0,0,0,.35);
+      --danger:#ff6b6b; --ok:#9af5c7; --warn:#ffd28a;
+      --border:rgba(215,180,106,.18); --border-strong:rgba(215,180,106,.35);
+      --chip-bg:rgba(215,180,106,.08);
+    }
+    *{box-sizing:border-box;}
+    html,body{height:100%;}
+    body{
+      margin:0; background:var(--bg-900); color:var(--cream);
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+      line-height:1.45;
+      background-image:
+        radial-gradient(1200px 800px at 75% -10%, rgba(215,180,106,.10), transparent 60%),
+        radial-gradient(900px 600px at 20% 110%, rgba(191,31,45,.12), transparent 60%),
+        radial-gradient(1200px 700px at -10% 10%, rgba(27,124,87,.10), transparent 55%);
+      background-attachment:fixed;
+      padding-bottom:80px;
+    }
+    .hidden{display:none!important;}
+
+    header{
+      position:sticky; top:0; z-index:40;
+      background:linear-gradient(to bottom, rgba(10,14,18,.88), rgba(10,14,18,.55) 60%, transparent);
+      border-bottom:1px solid rgba(215,180,106,.12);
+      backdrop-filter:saturate(140%) blur(8px);
+    }
+    .nav{
+      max-width:1280px; margin:0 auto; padding:14px 24px;
+      display:flex; align-items:center; gap:18px; flex-wrap:wrap;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      color:var(--cream); text-decoration:none;
+      font-family:'Bebas Neue',system-ui; font-size:20px; letter-spacing:.6px;
+      font-weight:400;
+    }
+    .brand img{ width:36px; height:36px; object-fit:cover; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,.4); }
+    .brand-wrap{ display:flex; flex-direction:column; align-items:flex-start; gap:6px; line-height:1.1; }
+    .chip{
+      border:1px solid var(--border-strong);
+      border-radius:8px; padding:4px 8px;
+      font-size:.7rem; line-height:1.2;
+      color:var(--gold-500);
+      background:var(--chip-bg);
+      font-weight:900; white-space:nowrap;
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:4px 8px; border-radius:999px;
+      border:1px solid rgba(215,180,106,.30);
+      background:rgba(215,180,106,.08);
+      color:var(--cream);
+      font-size:.75rem;
+      font-weight:900;
+    }
+    .pill.ok{ border-color:rgba(154,245,199,.35); background:rgba(154,245,199,.08); }
+    .pill.warn{ border-color:rgba(255,210,138,.35); background:rgba(255,210,138,.08); }
+    .pill.err{ border-color:rgba(255,107,107,.35); background:rgba(255,107,107,.08); color:#ffb4b4; }
+
+    .spacer{flex:1 1 auto;}
+    .user-chip{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:.9rem; }
+    .user-circle{ width:28px; height:28px; border-radius:999px; background:#2a3139; display:grid; place-items:center; font-weight:900; font-size:.8rem; }
+
+    .btn{
+      appearance:none; border:0; cursor:pointer; font-weight:900;
+      border-radius:12px; padding:8px 12px; font-size:.82rem; line-height:1.2;
+      transition:transform .06s ease, filter .2s ease, box-shadow .2s ease;
+      text-decoration:none; display:inline-flex; align-items:center; justify-content:center;
+      gap:8px; white-space:nowrap;
+    }
+    .btn:active{transform:translateY(1px);}
+    .btn-primary{
+      color:#101418;
+      background:linear-gradient(180deg,var(--paper),#e9dcc4);
+      box-shadow:inset 0 -1px 0 rgba(0,0,0,.25), 0 6px 18px rgba(0,0,0,.35);
+    }
+    .btn-ghost{
+      color:var(--cream);
+      background:transparent;
+      border:1px solid var(--border-strong);
+    }
+    .btn-ghost:hover{ background:rgba(215,180,106,.08); }
+    .btn-small{ padding:6px 10px; font-size:.75rem; border-radius:10px; }
+    .btn-danger{
+      border:1px solid rgba(255,107,107,.45);
+      background:rgba(255,107,107,.10);
+      color:#ffb4b4;
+    }
+
+    .wrap{ max-width:1280px; margin:0 auto; padding:24px; }
+
+    .card{
+      background:linear-gradient(180deg, rgba(23,29,36,.92), rgba(17,22,28,.92));
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow-soft);
+      padding:16px 18px;
+      position:relative;
+      overflow:hidden;
+    }
+    .card::before{
+      content:""; position:absolute; inset:-2px;
+      background:
+        radial-gradient(520px 180px at 20% 0%, rgba(215,180,106,.16), transparent 60%),
+        radial-gradient(620px 220px at 110% 120%, rgba(215,180,106,.10), transparent 55%);
+      opacity:.95; pointer-events:none;
+    }
+    .card > *{ position:relative; }
+
+    h1{margin:0;}
+    .title{
+      font-family:'Bebas Neue',system-ui; letter-spacing:.6px;
+      font-size:38px; font-weight:400;
+    }
+    .sub{ margin:6px 0 0; color:var(--muted-400); font-size:.92rem; }
+
+    .status{
+      margin-top:12px;
+      border:1px solid rgba(215,180,106,.18);
+      background:rgba(215,180,106,.05);
+      border-radius:14px;
+      padding:12px 14px;
+      color:var(--cream);
+      box-shadow:0 12px 32px rgba(0,0,0,.35);
+      font-size:.9rem;
+    }
+    .status.ok{ border-color:rgba(154,245,199,.35); background:rgba(154,245,199,.06); }
+    .status.err{ border-color:rgba(255,107,107,.35); background:rgba(255,107,107,.06); color:#ffb4b4; }
+    .status.warn{ border-color:rgba(255,210,138,.35); background:rgba(255,210,138,.06); }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 320px;
+      gap:14px;
+      margin-top:14px;
+    }
+    @media(max-width:980px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .panel{
+      border:1px solid rgba(215,180,106,.18);
+      background:rgba(215,180,106,.04);
+      border-radius:14px;
+      padding:12px 12px;
+    }
+    .panel h3{
+      margin:0 0 8px;
+      font-family:'Bebas Neue',system-ui;
+      letter-spacing:.6px;
+      font-weight:400;
+      font-size:20px;
+    }
+
+    input, select{
+      width:100%;
+      background:#0f1419;
+      border:1px solid rgba(215,180,106,.25);
+      border-radius:12px;
+      padding:10px 12px;
+      color:var(--cream);
+      font-size:.9rem;
+      font-family:inherit;
+      outline:none;
+    }
+    .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .row > *{ flex:1; }
+    .row .tight{ flex:0 0 auto; }
+
+    .fixture{
+      border:1px solid rgba(215,180,106,.14);
+      border-radius:14px;
+      background:rgba(10,14,18,.35);
+      overflow:hidden;
+      margin-top:10px;
+    }
+    .fixture-head{
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+      padding:12px 12px;
+      border-bottom:1px solid rgba(215,180,106,.12);
+    }
+    .fixture-head strong{ font-size:.95rem; }
+    .fixture-head .muted{ color:var(--muted-400); }
+    .fixture-body{ padding:12px 12px; }
+    .fixture-actions{ display:flex; gap:8px; flex-wrap:wrap; margin-left:auto; }
+
+    .sessions{
+      display:grid;
+      grid-template-columns: repeat(5, minmax(160px, 1fr));
+      gap:10px;
+    }
+    @media(max-width:1100px){
+      .sessions{ grid-template-columns: repeat(2, minmax(160px, 1fr)); }
+    }
+    @media(max-width:620px){
+      .sessions{ grid-template-columns: 1fr; }
+    }
+
+    .session{
+      border:1px solid rgba(215,180,106,.14);
+      border-radius:14px;
+      padding:10px 10px;
+      background:rgba(23,29,36,.55);
+    }
+    .session h4{
+      margin:0 0 8px;
+      font-size:.85rem;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--muted-400);
+    }
+    .slot{
+      display:flex; gap:8px; align-items:center;
+      margin-bottom:8px;
+    }
+    .slot .badge{
+      width:28px; height:28px; border-radius:10px;
+      display:grid; place-items:center;
+      border:1px solid rgba(215,180,106,.30);
+      background:rgba(215,180,106,.08);
+      font-weight:900;
+      font-size:.8rem;
+    }
+    .slot select{ padding:8px 10px; border-radius:10px; }
+
+    footer{ text-align:center; color:var(--muted-400); font-size:.8rem; margin:34px 0 0; }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="nav">
+    <div class="brand-wrap">
+      <a class="brand" href="/" aria-label="TrebleChasers ODL home">
+        <img src="/logo.png" alt="TrebleChasers ODL crest" />
+        <span>TrebleChasers ODL</span>
+      </a>
+      <span class="chip">
+        Captain Tools
+        <span id="modePill" class="pill warn">Loading…</span>
+      </span>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div id="authButtons">
+      <a class="btn btn-ghost" href="/teams.html">Back</a>
+      <a class="btn btn-primary" href="/">Log in</a>
+    </div>
+
+    <div id="userArea" class="user-chip hidden">
+      <div class="user-circle" id="userInitial">U</div>
+      <span id="userName">User</span>
+      <a class="btn btn-ghost" href="/teams.html">Teams Home</a>
+      <a id="adminBtn" class="btn btn-ghost hidden" href="/teams-admin.html">Admin</a>
+      <button id="btnSignOut" class="btn btn-ghost" type="button">Sign out</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="card">
+    <h1 class="title">Captain Tools</h1>
+    <p class="sub">Set your 5-session lineups (6 boards per session). Publish when both captains are ready.</p>
+
+    <div class="grid">
+      <div>
+        <div class="row" style="margin-top:12px;">
+          <input id="searchInput" type="text" placeholder="Search fixtures (team/opponent/number)..." />
+          <button id="btnReload" class="btn btn-ghost btn-small tight" type="button">Reload</button>
+        </div>
+
+        <div id="statusBox" class="status warn">Loading…</div>
+
+        <div id="fixturesWrap"></div>
+      </div>
+
+      <aside class="panel">
+        <h3>Captain panel</h3>
+        <div class="row">
+          <div>
+            <div class="muted" style="font-size:.8rem;color:var(--muted-400);margin-bottom:6px;">Your team</div>
+            <div id="teamName" style="font-weight:900;">—</div>
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div id="adminTeamPicker" class="hidden">
+          <div class="muted" style="font-size:.8rem;color:var(--muted-400);margin-bottom:6px;">Admin: pick a team</div>
+          <select id="teamPick">
+            <option value="__mine__">My team</option>
+          </select>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="muted" style="font-size:.82rem;color:var(--muted-400);">
+          <strong>How it saves:</strong><br/>
+          Lineups are stored on each fixture doc under <code>lineups</code>.<br/>
+          Publish sets <code>lineupSubmittedA/B</code> and timestamps.
+        </div>
+      </aside>
+    </div>
+
+  </section>
+
+  <footer>© <span id="year"></span> TrebleChasers ODL • Captain Tools</footer>
+</main>
+
+<script type="module" src="/teams-captain.js?v=1"></script>
+</body>
+</html>

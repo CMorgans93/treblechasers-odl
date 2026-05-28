@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TrebleChasers • Ranking</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #0a0e12;
+      --panel: #10151b;
+      --muted: #8d97a4;
+      --cream: #f1e7d3;
+      --gold: #d7b46a;
+      --red: #ff7272;
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 10% 10%, rgba(215,180,106,.05), transparent 60%), #0a0e12;
+      color: var(--cream);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      min-height: 100vh;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 18px;
+      border-bottom: 1px solid rgba(215,180,106,.12);
+      background: rgba(10,14,18,.75);
+      backdrop-filter: blur(6px);
+    }
+    .title {
+      display:flex;
+      gap:10px;
+      align-items:center;
+      font-family: "Bebas Neue";
+      font-size: 26px;
+    }
+    .chip {
+      background: rgba(215,180,106,.15);
+      border: 1px solid rgba(215,180,106,.4);
+      border-radius: 999px;
+      padding: 2px 9px;
+      font-size: .65rem;
+      color: var(--gold);
+    }
+    .btn {
+      background: transparent;
+      border: 1px solid rgba(241,231,211,.2);
+      color: var(--cream);
+      border-radius: 10px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: .7rem;
+    }
+    .btn.primary {
+      background: linear-gradient(180deg, #f0e3cf, #d9c090);
+      color: #101418;
+      border: 0;
+    }
+    main {
+      max-width: 1180px;
+      margin: 14px auto 40px;
+      padding: 0 14px;
+      display: grid;
+      gap: 16px;
+      grid-template-columns: 1fr;
+    }
+    .bar {
+      background: rgba(16,21,27,.85);
+      border: 1px solid rgba(215,180,106,.05);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .you-card {
+      background: linear-gradient(140deg, rgba(215,180,106,.18), rgba(10,14,18,0));
+      border: 1px solid rgba(215,180,106,.16);
+      border-radius: var(--radius);
+      padding: 12px 14px 10px;
+      min-height: 70px;
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      justify-content:space-between;
+    }
+    .you-left {
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+    }
+    .you-avatar {
+      width:38px;
+      height:38px;
+      border-radius:14px;
+      background:rgba(10,14,18,.4);
+      display:grid;
+      place-items:center;
+      font-weight:700;
+      font-size:.8rem;
+    }
+    .you-meta small {
+      display:block;
+      color: var(--muted);
+      font-size:.7rem;
+    }
+    .you-meta strong {
+      display:block;
+      font-size:1rem;
+    }
+    .stat-pill {
+      background: rgba(10,14,18,.3);
+      border: 1px solid rgba(241,231,211,.08);
+      border-radius: 10px;
+      padding: 4px 6px;
+      font-size: .68rem;
+      color: var(--cream);
+      text-align:right;
+    }
+
+    .tabs {
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .tab {
+      background: rgba(16,21,27,0);
+      border: 1px solid rgba(215,180,106,.1);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: .7rem;
+      cursor: pointer;
+      color: var(--cream);
+    }
+    .tab.active {
+      background: rgba(215,180,106,.1);
+      border-color: rgba(215,180,106,.35);
+      color: var(--gold);
+    }
+
+    .table-wrap {
+      background: rgba(16,21,27,.85);
+      border: 1px solid rgba(215,180,106,.04);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .78rem;
+    }
+    thead {
+      background: rgba(10,14,18,.5);
+    }
+    th, td {
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(241,231,211,.02);
+    }
+    th {
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      font-size: .6rem;
+      letter-spacing: .08em;
+    }
+    tr:hover td {
+      background: rgba(241,231,211,.02);
+    }
+    .muted { color: var(--muted); }
+    .pos {
+      font-family: "Bebas Neue";
+      font-size: 18px;
+    }
+    .danger {
+      color: var(--red);
+    }
+    footer {
+      text-align:center;
+      color:var(--muted);
+      font-size:.65rem;
+      margin: 20px 0 40px;
+    }
+    @media (max-width: 760px) {
+      .bar { flex-direction: column; align-items:flex-start; }
+      .you-card { flex-direction: column; }
+
+      /* hide the last two columns on small screens (Tournaments + Cups) */
+      th:nth-child(6),
+      td:nth-child(6),
+      th:nth-child(7),
+      td:nth-child(7) {
+        display:none;
+      }
+    }
+
+    /* Member name highlight */
+    .member-name{
+      color: #d7b46a;
+      font-weight: 700;
+      text-shadow:
+        0 0 6px rgba(215,180,106,.35),
+        0 0 16px rgba(215,180,106,.18);
+    }
+
+    /* Small gold badge */
+    .member-badge{
+      display:inline-block;
+      margin-left:6px;
+      padding: 1px 7px;
+      border-radius: 999px;
+      font-size: .62rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+
+      color: #0a0e12;
+      background: linear-gradient(180deg, #d7b46a, #8c6a2f);
+      box-shadow:
+        0 0 10px rgba(215,180,106,.22),
+        inset 0 0 0 1px rgba(241,231,211,.18);
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="title">
+      TrebleChasers Ranking
+      <span class="chip" id="seasonLabel">current season</span>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn" onclick="location.href='/'">Back</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- your summary -->
+    <div class="you-card" id="youCard" style="display:none;">
+      <div class="you-left">
+        <div class="you-avatar" id="youAvatar">U</div>
+        <div class="you-meta">
+          <small>Signed in as</small>
+          <strong id="youName">Loading…</strong>
+          <small id="youEmail"></small>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <div class="stat-pill">
+          <div style="font-size:.6rem;color:var(--muted);">TOTAL POINTS</div>
+          <div id="youTotal">0</div>
+        </div>
+        <div class="stat-pill">
+          <div style="font-size:.6rem;color:var(--muted);">POSITION</div>
+          <div id="youPosition">–</div>
+        </div>
+        <div class="stat-pill">
+          <div style="font-size:.6rem;color:var(--muted);">DIV AVG</div>
+          <div id="youDivAvg">–</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- filter bar -->
+    <div class="bar">
+      <div style="font-size:.75rem;color:var(--muted);">Show:</div>
+      <div class="tabs">
+        <button class="tab active" data-scope="all" id="tabAll">All</button>
+        <button class="tab" data-scope="division">Division</button>
+        <button class="tab" data-scope="freeplay">Freeplay</button>
+        <button class="tab" data-scope="tournaments">Tournaments</button>
+        <button class="tab" data-scope="cups">Cups</button>
+        <button class="tab" data-scope="members">Members</button>
+      </div>
+      <div style="flex:1;"></div>
+      <button class="btn" id="btnReload">Reload</button>
+    </div>
+
+    <!-- table -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Player</th>
+            <th>Total</th>
+            <th>Division</th>
+            <th>Freeplay</th>
+            <th>Tournaments</th>
+            <th>Cups</th>
+          </tr>
+        </thead>
+        <tbody id="rankingBody">
+          <tr><td colspan="7" class="muted">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <footer>
+      Rankings are calculated client-side from Firestore. If something looks wrong, refresh or ask an admin to re-sync.
+    </footer>
+  </main>
+
+  <script type="module" src="/ranking.js"></script>
+</body>
+</html>

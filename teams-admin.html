@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Teams Admin • TrebleChasers ODL</title>
+  <meta name="description" content="Admin • Treble Teams League — teams, rosters, fixtures, submissions moderation." />
+
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+
+  <style>
+    :root {
+      --bg-900:#0a0e12;
+      --bg-800:#11161c;
+      --bg-700:#171d24;
+      --cream:#f1e7d3;
+      --paper:#efe6d7;
+      --gold-500:#d7b46a;
+      --muted-400:#a7b0ba;
+      --muted-300:#798492;
+      --radius:18px;
+      --radius-lg:26px;
+      --shadow-soft:0 8px 24px rgba(0,0,0,.35);
+      --shadow-hard:0 12px 40px rgba(0,0,0,.5);
+      --danger:#ff6b6b;
+      --ok:#9af5c7;
+      --warn:#ffd28a;
+      --border:rgba(215,180,106,.18);
+      --border-strong:rgba(215,180,106,.35);
+      --chip-bg:rgba(215,180,106,.08);
+    }
+
+    *{box-sizing:border-box;}
+    html,body{height:100%;}
+    body{
+      margin:0;
+      background:var(--bg-900);
+      color:var(--cream);
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+      line-height:1.45;
+      background-image:
+        radial-gradient(1200px 800px at 75% -10%, rgba(215,180,106,.10), transparent 60%),
+        radial-gradient(900px 600px at 20% 110%, rgba(191,31,45,.12), transparent 60%),
+        radial-gradient(1200px 700px at -10% 10%, rgba(27,124,87,.10), transparent 55%);
+      background-attachment:fixed;
+      padding-bottom:80px;
+    }
+
+    .hidden{display:none!important;}
+
+    header{
+      position:sticky; top:0; z-index:40;
+      background:linear-gradient(to bottom, rgba(10,14,18,.88), rgba(10,14,18,.55) 60%, transparent);
+      border-bottom:1px solid rgba(215,180,106,.12);
+      backdrop-filter:saturate(140%) blur(8px);
+    }
+    .nav{
+      max-width:1280px; margin:0 auto; padding:14px 24px;
+      display:flex; align-items:center; gap:18px; flex-wrap:wrap;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      color:var(--cream); text-decoration:none;
+      font-family:'Bebas Neue',system-ui; font-size:20px; letter-spacing:.6px;
+    }
+    .brand img{ width:36px; height:36px; object-fit:cover; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,.4); }
+    .brand-wrap{ display:flex; flex-direction:column; align-items:flex-start; gap:6px; line-height:1.1; }
+    .chip{
+      border:1px solid var(--border-strong);
+      border-radius:8px; padding:4px 8px;
+      font-size:.7rem; line-height:1.2;
+      color:var(--gold-500);
+      background:var(--chip-bg);
+      font-weight:700; white-space:nowrap;
+    }
+    .spacer{flex:1 1 auto;}
+    .user-chip{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; color:var(--cream); font-size:.9rem; }
+    .user-circle{ width:28px; height:28px; border-radius:999px; background:#2a3139; display:grid; place-items:center; font-weight:800; font-size:.8rem; }
+    .btn{
+      appearance:none; border:0; cursor:pointer; font-weight:800;
+      border-radius:12px; padding:8px 12px; font-size:.82rem; line-height:1.2;
+      transition:transform .06s ease, filter .2s ease, box-shadow .2s ease;
+      text-decoration:none; display:inline-flex; align-items:center; justify-content:center;
+      gap:8px; white-space:nowrap;
+    }
+    .btn:active{transform:translateY(1px);}
+    .btn-primary{
+      color:#101418;
+      background:linear-gradient(180deg,var(--paper),#e9dcc4);
+      box-shadow:inset 0 -1px 0 rgba(0,0,0,.25), 0 6px 18px rgba(0,0,0,.35);
+    }
+    .btn-ghost{
+      color:var(--cream);
+      background:transparent;
+      border:1px solid var(--border-strong);
+    }
+    .btn-ghost:hover{ background:rgba(215,180,106,.08); }
+    .btn-danger{
+      border:1px solid rgba(255,107,107,.45);
+      background:rgba(255,107,107,.10);
+      color:#ffb4b4;
+    }
+    .btn-small{ padding:6px 10px; font-size:.75rem; border-radius:10px; }
+
+    .wrap{ max-width:1280px; margin:0 auto; padding:24px; }
+
+    .card{
+      background:linear-gradient(180deg, rgba(23,29,36,.92), rgba(17,22,28,.92));
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow-soft);
+      padding:16px 18px;
+      position:relative;
+      overflow:hidden;
+    }
+    .card::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(520px 180px at 20% 0%, rgba(215,180,106,.16), transparent 60%),
+        radial-gradient(620px 220px at 110% 120%, rgba(215,180,106,.10), transparent 55%);
+      opacity:.95;
+      pointer-events:none;
+    }
+    .card > * { position:relative; }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(min(460px,100%),1fr));
+      gap:16px;
+      margin-top:18px;
+    }
+
+    h1,h2,h3{ margin:0; }
+    .title{
+      font-family:'Bebas Neue',system-ui;
+      letter-spacing:.6px;
+      font-size:34px;
+      font-weight:400;
+      margin:10px 0 8px;
+    }
+    .sub{ color:var(--muted-400); font-size:.9rem; margin:0 0 14px; max-width:80ch; }
+
+    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    label{ font-size:.78rem; color:var(--muted-400); display:block; margin-bottom:6px; }
+    input, select{
+      width:100%;
+      background:#0f1419;
+      border:1px solid rgba(215,180,106,.25);
+      border-radius:12px;
+      padding:10px 12px;
+      color:var(--cream);
+      font-size:.9rem;
+      font-family:inherit;
+      outline:none;
+    }
+    .field{ flex:1; min-width:200px; }
+
+    .note{
+      margin-top:10px;
+      color:var(--muted-400);
+      font-size:.86rem;
+    }
+    .status{
+      margin-top:10px;
+      border:1px solid rgba(215,180,106,.18);
+      background:rgba(215,180,106,.05);
+      border-radius:14px;
+      padding:12px 14px;
+      color:var(--cream);
+      box-shadow:0 12px 32px rgba(0,0,0,.35);
+      font-size:.9rem;
+    }
+    .status.ok{ border-color:rgba(154,245,199,.35); background:rgba(154,245,199,.06); }
+    .status.err{ border-color:rgba(255,107,107,.35); background:rgba(255,107,107,.06); color:#ffb4b4; }
+    .status.warn{ border-color:rgba(255,210,138,.35); background:rgba(255,210,138,.06); }
+
+    .table-scroll{ overflow-x:auto; margin-top:10px; }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:900px;
+      font-size:.86rem;
+    }
+    th{
+      text-align:left;
+      font-size:.7rem;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      color:var(--muted-400);
+      padding:10px 8px;
+      border-bottom:1px solid rgba(215,180,106,.25);
+      white-space:nowrap;
+    }
+    td{
+      padding:10px 8px;
+      border-bottom:1px solid rgba(215,180,106,.12);
+      white-space:nowrap;
+      vertical-align:top;
+    }
+    .muted{ color:var(--muted-400); }
+    .pill{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:4px 8px; border-radius:999px;
+      border:1px solid rgba(215,180,106,.3);
+      background:rgba(215,180,106,.08);
+      color:var(--cream);
+      font-size:.75rem;
+      font-weight:800;
+    }
+    .pill.ok{ border-color:rgba(154,245,199,.35); background:rgba(154,245,199,.08); }
+    .pill.warn{ border-color:rgba(255,210,138,.35); background:rgba(255,210,138,.08); }
+    .pill.err{ border-color:rgba(255,107,107,.35); background:rgba(255,107,107,.08); color:#ffb4b4; }
+
+    footer{ text-align:center; color:var(--muted-400); font-size:.8rem; margin:34px 0 0; }
+
+    @media(max-width:560px){
+      .nav{ padding:12px 16px; }
+      .wrap{ padding:18px 16px; }
+      .title{ font-size:30px; }
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="nav">
+    <div class="brand-wrap">
+      <a class="brand" href="/" aria-label="TrebleChasers ODL home">
+        <img src="/logo.png" alt="TrebleChasers ODL crest" />
+        <span>TrebleChasers ODL</span>
+      </a>
+      <span class="chip">Teams Admin</span>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div id="authButtons">
+      <a class="btn btn-ghost" href="/">Back</a>
+      <a class="btn btn-primary" href="/">Log in</a>
+    </div>
+
+    <div id="userArea" class="user-chip hidden">
+      <div class="user-circle" id="userInitial">U</div>
+      <span id="userName">User</span>
+      <a class="btn btn-ghost" href="/teams.html">Teams Home</a>
+      <button id="btnSignOut" class="btn btn-ghost" type="button">Sign out</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1 class="title">Treble Teams League — Admin</h1>
+  <p class="sub">Create teams, assign captains & rosters, generate fixtures, and moderate submissions (legs).</p>
+
+  <div id="gateBox" class="status warn">Loading…</div>
+
+  <section id="adminArea" class="hidden">
+    <div class="grid">
+
+      <!-- League Meta -->
+      <div class="card">
+        <div class="row" style="justify-content:space-between; align-items:flex-end;">
+          <div>
+            <h2 style="font-family:'Bebas Neue'; letter-spacing:.6px; font-weight:400;">Season / Registration</h2>
+            <div class="muted">Controls for Teams landing page pill + interest button.</div>
+          </div>
+          <span class="pill" id="metaPill">Current</span>
+        </div>
+
+        <div style="margin-top:12px;" class="row">
+          <div class="field">
+            <label for="seasonName">Season name</label>
+            <input id="seasonName" placeholder="e.g. TEAMS S1" />
+          </div>
+          <div class="field">
+            <label for="registrationOpen">Registration open?</label>
+            <select id="registrationOpen">
+              <option value="true">Open</option>
+              <option value="false">Closed</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top:10px;" class="row">
+          <div class="field">
+            <label for="registrationDeadline">Registration deadline (optional)</label>
+            <input id="registrationDeadline" type="datetime-local" />
+            <div class="note">If set, teams.html shows a countdown pill.</div>
+          </div>
+          <div class="field" style="flex:0 0 auto; min-width:220px;">
+            <label>&nbsp;</label>
+            <button id="btnSaveMeta" class="btn btn-primary" type="button">Save meta</button>
+          </div>
+        </div>
+
+        <div id="metaStatus" class="note"></div>
+      </div>
+
+      <!-- Create Team -->
+      <div class="card">
+        <div class="row" style="justify-content:space-between; align-items:flex-end;">
+          <div>
+            <h2 style="font-family:'Bebas Neue'; letter-spacing:.6px; font-weight:400;">Create Team</h2>
+            <div class="muted">Team ID is a slug (e.g. “Red Lions” → red-lions).</div>
+          </div>
+          <span class="pill" id="teamsCountPill">0 teams</span>
+        </div>
+
+        <div style="margin-top:12px;" class="row">
+          <div class="field">
+            <label for="teamName">Team name</label>
+            <input id="teamName" placeholder="e.g. Red Lions" />
+          </div>
+          <div class="field" style="flex:0 0 auto; min-width:220px;">
+            <label>&nbsp;</label>
+            <button id="btnCreateTeam" class="btn btn-primary" type="button">Create team</button>
+          </div>
+        </div>
+
+        <div id="createTeamStatus" class="note"></div>
+
+        <div style="margin-top:14px;">
+          <h3 style="font-family:'Bebas Neue'; letter-spacing:.6px; font-weight:400;">Teams</h3>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Team</th>
+                  <th>Team ID</th>
+                  <th>Captain</th>
+                  <th>Players</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="teamsTbody"></tbody>
+            </table>
+          </div>
+          <div class="note">Tip: assigning a captain also sets their roster role to <b>captain</b>.</div>
+        </div>
+      </div>
+
+      <!-- Interest Pool / Roster -->
+      <div class="card" style="grid-column:1/-1;">
+        <div class="row" style="justify-content:space-between; align-items:flex-end;">
+          <div>
+            <h2 style="font-family:'Bebas Neue'; letter-spacing:.6px; font-weight:400;">Interest Pool → Assign to Teams</h2>
+            <div class="muted">Shows display names from /users (not UID).</div>
+          </div>
+          <span class="pill" id="interestCountPill">0 interested</span>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>UID</th>
+                <th>Interested</th>
+                <th>Assign to team</th>
+                <th>Role</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="interestTbody"></tbody>
+          </table>
+        </div>
+
+        <div class="note">
+          This writes <code>teamsleague/current/roster/{uid}</code>. Interest stays as the “player pool” record.
+        </div>
+      </div>
+
+      <!-- ALL USERS -->
+      <div class="card" style="grid-column:1/-1;">
+        <div class="row" style="justify-content:space-between; align-items:flex-end;">
+          <div>
+            <h2 style="font-family:'Bebas Neue'; letter-spacing:.6px; font-weight:400;">All Users → Quick Assign</h2>
+            <div class="muted">Search any member (even if they didn’t register interest). Assign them, and optionally add them to interest.</div>
+          </div>
+          <span class="pill" id="allUsersCountPill">0 users</span>
+        </div>
+
+        <div style="margin-top:12px;" class="row">
+          <div class="field" style="min-width:260px;">
+            <label for="allUsersSearch">Search</label>
+            <input id="allUsersSearch" type="text" placeholder="Search name, email or UID…" />
+          </div>
+
+          <div class="field" style="flex:0 0 auto; min-width:220px;">
+            <label>&nbsp;</label>
+            <button id="btnReloadUsers" class="btn btn-ghost btn-small" type="button">Reload users</button>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>UID</th>
+                <th>Interested</th>
+                <th>Current team</th>
+                <th>Assign to team</th>
+                <th>Role</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="allUsersTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Fixtures -->
+      <div class="card" style="grid-column:1/-1;">
+        <div class="row" style="justify-content:space-between; align-items:flex-end;">
+          <div>
+            <h2 style="font-family:'Bebas Neue'; letter-spacing:.6px; font-weight:400;">Fixtures</h2>
+            <div class="muted">Generates Fixture # order only (no dates). Round-robin, no repeats.</div>
+          </div>
+          <span class="pill" id="fixturesCountPill">0 fixtures</span>
+        </div>
+
+        <div style="margin-top:12px;" class="row">
+          <button id="btnGenerateFixtures" class="btn btn-primary" type="button">Generate fixtures</button>
+          <button id="btnDeleteFixtures" class="btn btn-danger" type="button">Delete ALL fixtures</button>
+          <span class="muted" id="fixturesNote"></span>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Fixture #</th>
+                <th>Team A</th>
+                <th>Team B</th>
+                <th>Status</th>
+                <th>Score</th>
+                <th>Lineups</th>
+                <th>Results</th>
+                <th>Doc ID</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="fixturesTbody"></tbody>
+          </table>
+        </div>
+
+        <!-- Fixture Results Editor (NEW) -->
+        <div id="fixtureEditorBox" class="status warn hidden" style="margin-top:12px;">
+          <div class="row" style="justify-content:space-between; align-items:center;">
+            <div>
+              <strong>Fixture Results Editor</strong>
+              <div id="fixtureEditorMeta" class="muted" style="margin-top:4px;">No fixture selected.</div>
+            </div>
+            <div class="row" style="gap:8px;">
+              <button id="btnFixtureEditorClose" class="btn btn-ghost btn-small" type="button">Close</button>
+            </div>
+          </div>
+
+          <input id="fixtureEditorId" type="hidden" />
+
+          <div class="row" style="margin-top:12px;">
+            <div class="field">
+              <label for="fixtureEditorStatus">Status</label>
+              <select id="fixtureEditorStatus">
+                <option value="">(clear)</option>
+                <option value="upcoming">upcoming</option>
+                <option value="pending">pending</option>
+                <option value="in-progress">in-progress</option>
+                <option value="completed">completed</option>
+                <option value="disputed">disputed</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="fixtureEditorScoreA">Final score A</label>
+              <input id="fixtureEditorScoreA" type="number" step="1" placeholder="e.g. 18" />
+            </div>
+
+            <div class="field">
+              <label for="fixtureEditorScoreB">Final score B</label>
+              <input id="fixtureEditorScoreB" type="number" step="1" placeholder="e.g. 12" />
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px;">
+            <div class="field">
+              <label for="fixtureEditorCompletedBoards">Completed boards</label>
+              <input id="fixtureEditorCompletedBoards" type="number" step="1" placeholder="e.g. 24" />
+            </div>
+
+            <div class="field">
+              <label for="fixtureEditorRequiredBoards">Required boards</label>
+              <input id="fixtureEditorRequiredBoards" type="number" step="1" placeholder="e.g. 30" />
+            </div>
+          </div>
+
+          <div style="margin-top:10px;">
+            <label for="fixtureEditorResultsJson">results (JSON)</label>
+            <textarea id="fixtureEditorResultsJson"
+              placeholder='{}'
+              style="width:100%; min-height:220px; background:#0f1419; border:1px solid rgba(215,180,106,.25); border-radius:12px; padding:10px 12px; color:var(--cream); font-size:.85rem; font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; outline:none; resize:vertical;"></textarea>
+            <div class="note">Leave blank to clear the <code>results</code> field.</div>
+          </div>
+
+          <div class="row" style="margin-top:12px;">
+            <button id="btnFixtureEditorSave" class="btn btn-primary" type="button">Save edits</button>
+            <button id="btnFixtureEditorResetResults" class="btn btn-danger" type="button">Reset results</button>
+            <button id="btnFixtureEditorDeleteFixture" class="btn btn-danger" type="button">Delete fixture</button>
+          </div>
+
+          <div id="fixtureEditorStatusMsg" class="note" style="margin-top:10px;"></div>
+        </div>
+
+        <div class="note">
+          Fixture docs include <code>teamAId</code>, <code>teamBId</code>, <code>fixtureNo</code>, lineup flags for captains, and editable results summary fields.
+        </div>
+      </div>
+
+      <!-- Legs moderation -->
+      <div class="card" style="grid-column:1/-1;">
+        <div class="row" style="justify-content:space-between; align-items:flex-end;">
+          <div>
+            <h2 style="font-family:'Bebas Neue'; letter-spacing:.6px; font-weight:400;">All Submissions (Legs)</h2>
+            <div class="muted">View + delete now. Edit/override UI can be added next.</div>
+          </div>
+          <span class="pill" id="legsCountPill">0 legs</span>
+        </div>
+
+        <div style="margin-top:12px;" class="row">
+          <div class="field">
+            <label for="legStatusFilter">Filter status</label>
+            <select id="legStatusFilter">
+              <option value="">All</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="disputed">Disputed</option>
+              <option value="auto">Auto</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="legFixtureFilter">Filter fixture #</label>
+            <input id="legFixtureFilter" placeholder="e.g. 3" />
+          </div>
+          <div class="field" style="flex:0 0 auto; min-width:220px;">
+            <label>&nbsp;</label>
+            <button id="btnRefreshLegs" class="btn btn-ghost" type="button">Refresh</button>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Fixture</th>
+                <th>Session</th>
+                <th>Slot</th>
+                <th>Players</th>
+                <th>Winner</th>
+                <th>Status</th>
+                <th>Reported</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="legsTbody"></tbody>
+          </table>
+        </div>
+
+        <div class="note">Deleting legs is admin-only and permanent.</div>
+      </div>
+
+    </div>
+
+    <footer>© <span id="year"></span> TrebleChasers ODL • Teams Admin</footer>
+  </section>
+</main>
+
+<script type="module" src="/teams-admin.js"></script>
+</body>
+</html>

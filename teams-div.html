@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Team Division • Treble Teams League</title>
+  <meta name="description" content="Team division fixtures — filter by team, open fixture detail, lineups and results." />
+
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+
+  <style>
+    :root{
+      --bg-900:#0a0e12; --bg-800:#11161c; --bg-700:#171d24;
+      --cream:#f1e7d3; --paper:#efe6d7; --gold-500:#d7b46a;
+      --muted-400:#a7b0ba; --muted-300:#798492;
+      --radius:18px; --radius-lg:26px;
+      --shadow-soft:0 8px 24px rgba(0,0,0,.35);
+      --danger:#ff6b6b; --ok:#9af5c7; --warn:#ffd28a;
+      --border:rgba(215,180,106,.18); --border-strong:rgba(215,180,106,.35);
+      --chip-bg:rgba(215,180,106,.08);
+    }
+    *{box-sizing:border-box;}
+    html,body{height:100%;}
+    body{
+      margin:0; background:var(--bg-900); color:var(--cream);
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+      line-height:1.45;
+      background-image:
+        radial-gradient(1200px 800px at 75% -10%, rgba(215,180,106,.10), transparent 60%),
+        radial-gradient(900px 600px at 20% 110%, rgba(191,31,45,.12), transparent 60%),
+        radial-gradient(1200px 700px at -10% 10%, rgba(27,124,87,.10), transparent 55%);
+      background-attachment:fixed;
+      padding-bottom:80px;
+    }
+    .hidden{display:none!important;}
+
+    header{
+      position:sticky; top:0; z-index:40;
+      background:linear-gradient(to bottom, rgba(10,14,18,.88), rgba(10,14,18,.55) 60%, transparent);
+      border-bottom:1px solid rgba(215,180,106,.12);
+      backdrop-filter:saturate(140%) blur(8px);
+    }
+    .nav{
+      max-width:1280px; margin:0 auto; padding:14px 24px;
+      display:flex; align-items:center; gap:18px; flex-wrap:wrap;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      color:var(--cream); text-decoration:none;
+      font-family:'Bebas Neue',system-ui; font-size:20px; letter-spacing:.6px;
+      font-weight:400;
+    }
+    .brand img{ width:36px; height:36px; object-fit:cover; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,.4); }
+    .brand-wrap{ display:flex; flex-direction:column; align-items:flex-start; gap:6px; line-height:1.1; }
+    .chip{
+      border:1px solid var(--border-strong);
+      border-radius:8px; padding:4px 8px;
+      font-size:.7rem; line-height:1.2;
+      color:var(--gold-500);
+      background:var(--chip-bg);
+      font-weight:900; white-space:nowrap;
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .spacer{flex:1 1 auto;}
+    .user-chip{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:.9rem; }
+    .user-circle{ width:28px; height:28px; border-radius:999px; background:#2a3139; display:grid; place-items:center; font-weight:900; font-size:.8rem; }
+
+    .btn{
+      appearance:none; border:0; cursor:pointer; font-weight:900;
+      border-radius:12px; padding:8px 12px; font-size:.82rem; line-height:1.2;
+      transition:transform .06s ease, filter .2s ease, box-shadow .2s ease;
+      text-decoration:none; display:inline-flex; align-items:center; justify-content:center;
+      gap:8px; white-space:nowrap;
+    }
+    .btn:active{transform:translateY(1px);}
+    .btn-primary{
+      color:#101418;
+      background:linear-gradient(180deg,var(--paper),#e9dcc4);
+      box-shadow:inset 0 -1px 0 rgba(0,0,0,.25), 0 6px 18px rgba(0,0,0,.35);
+    }
+    .btn-ghost{
+      color:var(--cream);
+      background:transparent;
+      border:1px solid var(--border-strong);
+    }
+    .btn-ghost:hover{ background:rgba(215,180,106,.08); }
+    .btn-small{ padding:6px 10px; font-size:.75rem; border-radius:10px; }
+    .btn.active{
+      background:rgba(215,180,106,.12);
+      border:1px solid rgba(215,180,106,.35);
+    }
+
+    .wrap{ max-width:1280px; margin:0 auto; padding:24px; }
+
+    .card{
+      background:linear-gradient(180deg, rgba(23,29,36,.92), rgba(17,22,28,.92));
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow-soft);
+      padding:16px 18px;
+      position:relative;
+      overflow:hidden;
+    }
+    .card::before{
+      content:""; position:absolute; inset:-2px;
+      background:
+        radial-gradient(520px 180px at 20% 0%, rgba(215,180,106,.16), transparent 60%),
+        radial-gradient(620px 220px at 110% 120%, rgba(215,180,106,.10), transparent 55%);
+      opacity:.95; pointer-events:none;
+    }
+    .card > *{ position:relative; }
+
+    h1,h2{margin:0;}
+    .title{
+      font-family:'Bebas Neue',system-ui; letter-spacing:.6px;
+      font-size:38px; font-weight:400;
+    }
+    .sub{ margin:6px 0 0; color:var(--muted-400); font-size:.92rem; }
+
+    .status{
+      margin-top:12px;
+      border:1px solid rgba(215,180,106,.18);
+      background:rgba(215,180,106,.05);
+      border-radius:14px;
+      padding:12px 14px;
+      color:var(--cream);
+      box-shadow:0 12px 32px rgba(0,0,0,.35);
+      font-size:.9rem;
+    }
+    .status.ok{ border-color:rgba(154,245,199,.35); background:rgba(154,245,199,.06); }
+    .status.err{ border-color:rgba(255,107,107,.35); background:rgba(255,107,107,.06); color:#ffb4b4; }
+    .status.warn{ border-color:rgba(255,210,138,.35); background:rgba(255,210,138,.06); }
+
+    .pill{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:4px 8px; border-radius:999px;
+      border:1px solid rgba(215,180,106,.30);
+      background:rgba(215,180,106,.08);
+      color:var(--cream);
+      font-size:.75rem;
+      font-weight:900;
+    }
+    .pill.ok{ border-color:rgba(154,245,199,.35); background:rgba(154,245,199,.08); }
+    .pill.warn{ border-color:rgba(255,210,138,.35); background:rgba(255,210,138,.08); }
+    .pill.err{ border-color:rgba(255,107,107,.35); background:rgba(255,107,107,.08); color:#ffb4b4; }
+
+    .controls{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+      margin-top:14px;
+    }
+    input, select{
+      background:#0f1419;
+      border:1px solid rgba(215,180,106,.25);
+      border-radius:12px;
+      padding:10px 12px;
+      color:var(--cream);
+      font-size:.9rem;
+      font-family:inherit;
+      outline:none;
+    }
+    .controls input{ min-width:260px; }
+    .controls select{ min-width:240px; }
+
+    .table-scroll{ overflow-x:auto; margin-top:12px; }
+    table{ width:100%; border-collapse:collapse; min-width:980px; font-size:.88rem; }
+    th{
+      text-align:left; font-size:.7rem; text-transform:uppercase;
+      letter-spacing:.08em; color:var(--muted-400);
+      padding:10px 8px; border-bottom:1px solid rgba(215,180,106,.25); white-space:nowrap;
+    }
+    td{
+      padding:12px 8px; border-bottom:1px solid rgba(215,180,106,.12);
+      white-space:nowrap; vertical-align:top;
+    }
+    tr.clickable{ cursor:pointer; }
+    tr.clickable:hover{ background:rgba(215,180,106,.06); }
+
+    .flag{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:22px; height:22px; border-radius:999px;
+      border:1px solid rgba(215,180,106,.35);
+      background:rgba(215,180,106,.08);
+      font-size:.72rem; font-weight:900;
+      margin-right:6px;
+    }
+    .muted{ color:var(--muted-400); }
+
+    footer{ text-align:center; color:var(--muted-400); font-size:.8rem; margin:34px 0 0; }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="nav">
+    <div class="brand-wrap">
+      <a class="brand" href="/" aria-label="TrebleChasers ODL home">
+        <img src="/logo.png" alt="TrebleChasers ODL crest" />
+        <span>TrebleChasers ODL</span>
+      </a>
+      <span class="chip">
+        Team Division
+        <span id="modePill" class="pill warn">Loading…</span>
+      </span>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div id="authButtons">
+      <a class="btn btn-ghost" href="/teams.html">Back</a>
+      <a class="btn btn-primary" href="/">Log in</a>
+    </div>
+
+    <div id="userArea" class="user-chip hidden">
+      <div class="user-circle" id="userInitial">U</div>
+      <span id="userName">User</span>
+      <a class="btn btn-ghost" href="/teams.html">Teams Home</a>
+      <a id="adminBtn" class="btn btn-ghost hidden" href="/teams-admin.html">Admin</a>
+      <button id="btnSignOut" class="btn btn-ghost" type="button">Sign out</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="card">
+    <h1 class="title">Team Division</h1>
+    <p class="sub">Click a fixture to open the lineup + submissions page.</p>
+
+    <div class="controls">
+      <input id="searchInput" type="text" placeholder="Search team / fixture…" />
+
+      <select id="divisionFilter">
+        <option value="__all__">All Divisions</option>
+      </select>
+
+      <select id="teamFilter">
+        <option value="__my__">My Team</option>
+        <option value="__all__">All Teams</option>
+      </select>
+
+      <span class="pill" id="countPill">Fixtures</span>
+
+      <button id="btnReload" class="btn btn-ghost btn-small" type="button">Reload</button>
+
+      <!-- Proper tabs -->
+      <button id="btnViewTable" class="btn btn-ghost btn-small" type="button">Leaderboard</button>
+      <button id="btnViewFixtures" class="btn btn-ghost btn-small active" type="button">Fixtures</button>
+    </div>
+
+    <div id="statusBox" class="status warn">Loading…</div>
+
+    <!-- Fixtures view -->
+    <div id="fixturesView" class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Fixture #</th>
+            <th>Team A</th>
+            <th>Team B</th>
+            <th>Status</th>
+            <th>Lineup flags</th>
+          </tr>
+        </thead>
+        <tbody id="fixturesTbody"></tbody>
+      </table>
+    </div>
+
+    <!-- Leaderboard view -->
+    <div id="tableView" class="table-scroll hidden">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Team</th>
+            <th>P</th>
+            <th>W</th>
+            <th>L</th>
+            <th>LF</th>
+            <th>LA</th>
+            <th>Diff</th>
+            <th>171+</th>
+            <th>100+</th>
+            <th>Bull</th>
+            <th>Double/Double</th>
+            <th>Avg</th>
+            <th>Points</th>
+          </tr>
+        </thead>
+        <tbody id="tableTbody"></tbody>
+      </table>
+    </div>
+
+  </section>
+
+  <footer>© <span id="year"></span> TrebleChasers ODL • Team Division</footer>
+</main>
+
+<script type="module" src="/teams-div.js"></script>
+</body>
+</html>

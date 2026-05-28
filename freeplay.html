@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Freeplay • TrebleChasers ODL</title>
+  <meta name="description" content="Freeplay (open ladder) for TrebleChasers ODL" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-900:#0a0e12;
+      --bg-800:#11161c;
+      --card:#171d24;
+      --cream:#f1e7d3;
+      --muted:#a7b0ba;
+      --gold:#d7b46a;
+      --border:rgba(215,180,106,.22);
+      --ok:#9af5c7;
+      --warn:#ffd28a;
+      --err:#ff6b6b;
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:var(--bg-900);
+      background-image:
+        radial-gradient(1200px 800px at 75% -10%, rgba(215,180,106,.10), transparent 60%),
+        radial-gradient(900px 600px at 20% 110%, rgba(191,31,45,.12), transparent 60%),
+        radial-gradient(1200px 700px at -10% 10%, rgba(27,124,87,.10), transparent 55%);
+      background-attachment:fixed;
+      color:var(--cream);
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+      line-height:1.45;
+      padding:16px clamp(16px,2vw,24px) 80px;
+    }
+
+    /* lock background scroll when any modal open */
+    body.modal-open{ overflow:hidden; }
+
+    header.page-head{
+      display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:flex-start;margin-bottom:24px;
+    }
+    .head-left{min-width:0;display:flex;flex-direction:column;gap:6px}
+    .page-title{display:flex;gap:10px;align-items:center;font-family:"Bebas Neue",system-ui;font-size:30px;letter-spacing:.5px}
+    .chip{background:rgba(215,180,106,.08);border:1px solid rgba(215,180,106,.40);border-radius:10px;padding:4px 8px;font-size:.7rem;font-weight:600}
+    .subline{color:var(--muted);font-size:.9rem;max-width:820px}
+
+    .head-actions{display:flex;flex-wrap:wrap;gap:10px}
+    .btn{appearance:none;border:0;cursor:pointer;border-radius:12px;padding:8px 12px;font-size:.8rem;font-weight:600}
+    .btn-ghost{background:transparent;border:1px solid rgba(215,180,106,.40);color:var(--cream)}
+    .btn-primary{background:linear-gradient(180deg,#f1e7d3,#e9dcc4);color:#0f1317;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+
+    .card{
+      background:linear-gradient(180deg, rgba(23,29,36,.92), rgba(17,22,28,.92));
+      border:1px solid rgba(215,180,106,.25);
+      border-radius:18px;
+      overflow:hidden;
+      box-shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    .card-head{
+      padding:14px 16px;
+      border-bottom:1px solid rgba(215,180,106,.18);
+      display:flex;justify-content:space-between;align-items:flex-start;gap:12px;
+    }
+    .card-title{display:flex;gap:10px;align-items:center;font-weight:800}
+    .card-meta{color:var(--muted);font-size:.82rem;display:flex;gap:10px;flex-wrap:wrap}
+    .tbl-wrap{overflow:auto; -webkit-overflow-scrolling:touch;}
+    table{width:100%;border-collapse:collapse;min-width:1180px}
+    th,td{padding:10px 12px;border-bottom:1px solid rgba(215,180,106,.12);text-align:left;font-size:.85rem;white-space:nowrap}
+    th{color:rgba(241,231,211,.85);font-weight:800;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em}
+    tr:hover td{background:rgba(215,180,106,.06)}
+    td .name{font-weight:800;color:var(--cream);text-decoration:underline;cursor:pointer}
+    td .name.member-name{ color: var(--gold) !important; }
+    .diff-pos{color:var(--ok);font-weight:800}
+    .diff-neg{color:var(--err);font-weight:800}
+    tr.highlight td{background:rgba(215,180,106,.09)}
+
+    #needLoginBox{
+      display:none;
+      margin:12px 0 18px;
+      padding:12px 14px;
+      border:1px solid rgba(255,107,107,.35);
+      border-radius:14px;
+      background:rgba(255,107,107,.08);
+      color:var(--cream);
+    }
+
+    /* ---------- modals ---------- */
+    .modal-overlay{
+      position:fixed;inset:0;background:rgba(0,0,0,.65);
+      display:none;align-items:center;justify-content:center;padding:18px;z-index:50
+    }
+    .modal-overlay.open{display:flex}
+    .modal{
+      width:min(980px, 96vw);
+      max-height:85vh;
+      background:linear-gradient(180deg, rgba(23,29,36,.96), rgba(17,22,28,.96));
+      border:1px solid rgba(215,180,106,.28);
+      border-radius:18px;
+      padding:14px 16px;
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+    }
+    .modal header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+    .modal h3{margin:0;font-family:"Bebas Neue";font-size:24px}
+    .modal .close{background:transparent;border:1px solid rgba(241,231,211,.25);border-radius:10px;color:var(--cream);padding:6px 10px;cursor:pointer}
+    .modal .row{display:flex;gap:10px;flex-wrap:wrap}
+    .modal label{font-size:.8rem;color:var(--muted)}
+    .modal input,.modal select{
+      background:#0f1419;border:1px solid rgba(215,180,106,.25);
+      border-radius:10px;padding:10px 12px;color:var(--cream);width:100%;font-size:.9rem
+    }
+    .section{display:flex;flex-direction:column;gap:10px;margin-bottom:10px}
+
+    .fixture-item{border:1px solid rgba(215,180,106,.18);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+    .status{font-size:.8rem;color:var(--muted)}
+    .status.ok{color:var(--ok)}
+    .status.warn{color:var(--warn)}
+    .status.err{color:var(--err)}
+
+    /* rules modal scroll */
+    #rulesModal .rules-body{max-height:60vh;overflow-y:auto;line-height:1.4;font-size:.85rem;color:var(--cream)}
+
+    /* submit search */
+    #fpOpponentSearch, #calcOpponentSearch{margin-bottom:6px}
+
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      border:1px solid rgba(215,180,106,.25);
+      border-radius:12px;padding:10px 12px;background:#0f1419;color:var(--cream)
+    }
+    .pill input{width:auto}
+
+    .note{color:var(--muted);font-size:.8rem;line-height:1.35}
+    .breakdown{
+      border:1px solid rgba(215,180,106,.18);
+      border-radius:12px;
+      padding:10px 12px;
+      background:rgba(215,180,106,.04);
+      color:var(--cream);
+      font-size:.85rem;
+    }
+    .breakdown ul{margin:8px 0 0 18px}
+    .breakdown li{margin:4px 0}
+
+    /* ---------- My Stats (tabs) ---------- */
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px}
+    .tab-btn{
+      border:1px solid rgba(215,180,106,.25);
+      background:transparent;color:var(--cream);
+      border-radius:12px;padding:8px 10px;
+      cursor:pointer;font-weight:800;font-size:.8rem
+    }
+    .tab-btn.active{background:rgba(215,180,106,.12)}
+    .tab-panel{display:none}
+    .tab-panel.active{display:block}
+
+    .stats-grid{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      gap:10px;
+    }
+    .stat-card{
+      border:1px solid rgba(215,180,106,.18);
+      border-radius:14px;
+      padding:10px 12px;
+      background:rgba(215,180,106,.04);
+    }
+    .stat-k{color:var(--muted);font-size:.78rem}
+    .stat-v{font-weight:900;font-size:1.05rem}
+    @media(max-width:820px){ .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));} }
+    @media(max-width:520px){ .stats-grid{grid-template-columns:1fr;} }
+
+    .chart-box{
+      border:1px solid rgba(215,180,106,.18);
+      border-radius:14px;
+      padding:10px 12px;
+      background:rgba(215,180,106,.04);
+      margin-bottom:10px;
+    }
+
+    /* chart sizing (prevents modal reflow/stretch after render) */
+    .chart-wrap{ position:relative; height:260px; }
+    .chart-wrap.short{ height:220px; }
+    .chart-wrap.tall{ height:300px; }
+    .chart-wrap canvas{ width:100% !important; height:100% !important; }
+
+    canvas{max-width:100%}
+
+    @media(max-width:620px){
+      table{min-width:1180px}
+      header.page-head{flex-direction:column;align-items:flex-start}
+      .head-actions{order:2}
+    }
+    /* ===========================
+   Member highlight (Gold name + M badge)
+   =========================== */
+.member-name{
+  color: var(--gold);
+  font-weight: 900;
+  text-shadow:
+    0 0 6px rgba(215,180,106,.35),
+    0 0 16px rgba(215,180,106,.18);
+}
+
+.member-badge{
+  display:inline-block;
+  margin-left:6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: .62rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+
+  color: #0a0e12;
+  background: linear-gradient(180deg, #d7b46a, #8c6a2f);
+  box-shadow:
+    0 0 10px rgba(215,180,106,.22),
+    inset 0 0 0 1px rgba(241,231,211,.18);
+  vertical-align: middle;
+}
+
+  </style>
+</head>
+<body>
+  <header class="page-head">
+    <div class="head-left">
+      <div class="page-title">
+        <span>Freeplay Leaderboard</span>
+        <span class="chip" id="formatChip">SOP: Best of 8</span>
+        <span class="chip" id="fpSeasonChip">OPEN LADDER</span>
+      </div>
+      <p class="subline">
+        Play anyone (if eligible). Submit using the format dropdown (501/301/701/Cricket). Points auto-calc with multipliers and penalties where applicable.
+      </p>
+    </div>
+    <div class="head-actions">
+      <button class="btn btn-ghost" id="btnFindMe">Find me</button>
+      <button class="btn btn-ghost" id="btnRules">Freeplay rules</button>
+      <button class="btn btn-ghost" id="btnInbox">Inbox (<span id="inboxCount">0</span>)</button>
+      <button class="btn btn-ghost" id="btnMyStats">My Stats (Members)</button>
+      <button class="btn btn-ghost" id="btnCalc">Points calculator</button>
+      <button class="btn btn-primary" id="btnSubmit">Submit result</button>
+      <button class="btn btn-ghost" onclick="window.location.href='/'">Back</button>
+    </div>
+  </header>
+
+  <section id="needLoginBox">You must be signed in and eligible to play Freeplay.</section>
+
+  <section class="card">
+    <div class="card-head">
+      <div>
+        <div class="card-title">
+          <span>Freeplay leaderboard</span>
+          <span class="chip">all formats</span>
+        </div>
+        <div class="card-meta">
+          <span id="updatedMeta">Last updated: —</span>
+          <span id="errorMeta" style="display:none;color:var(--err)">Error loading freeplay.</span>
+        </div>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Pos</th>
+            <th>Player</th>
+            <th>Div</th>
+            <th>Games</th>
+            <th>Wins</th>
+            <th>Draws</th>
+            <th>Losses</th>
+            <th>301 W</th>
+            <th>701 W</th>
+            <th>Cricket W</th>
+            <th>Legs for</th>
+            <th>Legs against</th>
+            <th>Leg diff</th>
+            <th>171+</th>
+            <th>100+</th>
+            <th>Bull</th>
+            <th>Double/Double</th>
+            <th>FP avg</th>
+            <th>FP pts</th>
+          </tr>
+        </thead>
+        <tbody id="fpTableBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SUBMIT MODAL -->
+  <div class="modal-overlay" id="submitModal">
+    <div class="modal">
+      <header>
+        <h3>Submit freeplay result</h3>
+        <button class="close" data-close="#submitModal">Close</button>
+      </header>
+
+      <div class="section">
+        <label for="fpOpponentSearch">Search opponent</label>
+        <input id="fpOpponentSearch" type="text" placeholder="Type to filter players." />
+      </div>
+
+      <div class="section">
+        <div class="row">
+          <div style="flex:1;">
+            <label for="fpOpponent">Opponent</label>
+            <select id="fpOpponent"></select>
+          </div>
+
+          <div style="flex:1;">
+            <label>Game format</label>
+            <div class="row">
+              <select id="fpGameType" style="flex:1;">
+                <option value="501">501</option>
+                <option value="301">301</option>
+                <option value="701">701</option>
+                <option value="cricket">Cricket</option>
+              </select>
+              <select id="fpLengthMode" style="flex:1;">
+                <option value="bestOf">Best of</option>
+                <option value="firstTo">First to</option>
+              </select>
+              <input id="fpTarget" type="number" min="1" max="100" value="8" style="flex:1;" />
+            </div>
+
+            <div class="row" style="margin-top:8px;align-items:center;">
+              <label class="pill" id="fpDidoWrap" title="If ticked, leg-points are doubled">
+                <input id="fpDido" type="checkbox" />
+                Dbl in / Dbl out (double leg points)
+              </label>
+              <div class="note" id="fpRuleNote" style="flex:1;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="row">
+          <div style="flex:1;">
+            <label id="fpScoreLabel">Score</label>
+            <div class="row">
+              <input id="fpMyLegs" type="number" min="0" placeholder="Your legs won" />
+              <input id="fpOppLegs" type="number" min="0" placeholder="Opp legs won" />
+            </div>
+            <small class="note" id="fpScoreHelp">SOP: Best of 8</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" id="fpBonusWrap">
+        <div class="row">
+          <div style="flex:1;">
+            <label>Your bonuses <small class="note">(instances only • 0–10 each)</small></label>
+            <select id="fpMy171"></select>
+            <select id="fpMy100"></select>
+            <select id="fpMyBull"></select>
+            <select id="fpMyDD"></select>
+          </div>
+          <div style="flex:1;">
+            <label>Opponent bonuses <small class="note">(instances only • 0–10 each)</small></label>
+            <select id="fpOpp171"></select>
+            <select id="fpOpp100"></select>
+            <select id="fpOppBull"></select>
+            <select id="fpOppDD"></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" id="fpAvgWrap">
+        <div class="row">
+          <div style="flex:1;">
+            <label>Your match avg (Must be filled in)</label>
+            <input id="fpMyAvg" type="number" min="0" step="0.1" placeholder="Your match avg" />
+          </div>
+          <div style="flex:1;">
+            <label>Opponent match avg (Must be filled in)</label>
+            <input id="fpOppAvg" type="number" min="0" step="0.1" placeholder="Opp match avg" />
+          </div>
+        </div>
+      </div>
+
+      <div class="section" id="fpTotalsWrap" style="display:flex;gap:20px;">
+        <div id="fpTotalsMine"><small>You: <strong>Total 0</strong></small></div>
+        <div id="fpTotalsOpp"><small>Opponent: <strong>Total 0</strong></small></div>
+      </div>
+
+      <div class="section">
+        <button class="btn btn-primary" id="fpSubmitBtn" type="button" style="width:100%;">Submit</button>
+        <div id="fpSubmitNote" style="color:var(--err);display:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INBOX MODAL -->
+  <div class="modal-overlay" id="inboxModal">
+    <div class="modal">
+      <header>
+        <h3>Inbox</h3>
+        <button class="close" data-close="#inboxModal">Close</button>
+      </header>
+      <div class="section" id="inboxList"></div>
+      <div class="section"><small class="note">Confirm to lock. Dispute to flag for admin.</small></div>
+    </div>
+  </div>
+
+  <!-- RULES MODAL -->
+  <div class="modal-overlay" id="rulesModal">
+    <div class="modal" id="rulesModalInner">
+      <header>
+        <h3>Freeplay rules</h3>
+        <button class="close" data-close="#rulesModal">Close</button>
+      </header>
+      <div class="rules-body">
+        <p><strong>Formats:</strong> 501 / 301 / 701 / Cricket.</p>
+        <p><strong>Length:</strong> Best of or First to. Max 100 total legs.</p>
+        <p><strong>Dbl in / Dbl out:</strong> if ticked, leg points are doubled (501/301/701 only).</p>
+        <p><strong>Cricket:</strong> flat leg scoring, no bonuses/avgs/form/multipliers.</p>
+        <p><strong>Eligibility:</strong> Members = day 1. Non-members unlock after 5 division games (or freeplayEnabled override).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOT ELIGIBLE MODAL -->
+  <div class="modal-overlay" id="notEligibleModal">A
+    <div class="modal">
+      <header>
+        <h3>Freeplay not unlocked</h3>
+        <button class="close" data-close="#notEligibleModal">Close</button>
+      </header>
+      <p style="margin-top:6px;line-height:1.5;">
+        You're not eligible to submit freeplay results yet.
+      </p>
+      <p style="margin-top:6px;line-height:1.5;">
+        ✅ Members can play freeplay from day 1.<br>
+        ✅ Non-members must play <strong>5 division matches</strong> first (or be manually enabled).
+      </p>
+      <div style="margin-top:14px;text-align:right;">
+        <button class="btn btn-ghost close" data-close="#notEligibleModal">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POINTS CALCULATOR MODAL -->
+  <div class="modal-overlay" id="calcModal">
+    <div class="modal">
+      <header>
+        <h3>Points calculator</h3>
+        <button class="close" data-close="#calcModal">Close</button>
+      </header>
+
+      <div class="section">
+        <label for="calcOpponentSearch">Search opponent</label>
+        <input id="calcOpponentSearch" type="text" placeholder="Type to filter players." />
+      </div>
+
+      <div class="section">
+        <div class="row">
+          <div style="flex:1;">
+            <label for="calcOpponent">Opponent</label>
+            <select id="calcOpponent"></select>
+          </div>
+
+          <div style="flex:1;">
+            <label>Game format</label>
+            <div class="row">
+              <select id="calcGameType" style="flex:1;">
+                <option value="501">501</option>
+                <option value="301">301</option>
+                <option value="701">701</option>
+                <option value="cricket">Cricket</option>
+              </select>
+              <select id="calcLengthMode" style="flex:1;">
+                <option value="bestOf">Best of</option>
+                <option value="firstTo">First to</option>
+              </select>
+              <input id="calcTarget" type="number" min="1" max="100" value="8" style="flex:1;" />
+            </div>
+
+            <div class="row" style="margin-top:8px;align-items:center;">
+              <label class="pill" id="calcDidoWrap" title="If ticked, leg-points are doubled">
+                <input id="calcDido" type="checkbox" />
+                Dbl in / Dbl out (double leg points)
+              </label>
+              <div class="note" id="calcRuleNote" style="flex:1;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="row">
+          <div style="flex:1;">
+            <label id="calcScoreLabel">Score</label>
+            <div class="row">
+              <input id="calcMyLegs" type="number" min="0" placeholder="Your legs won" />
+              <input id="calcOppLegs" type="number" min="0" placeholder="Opp legs won" />
+            </div>
+            <small class="note" id="calcScoreHelp">SOP: Best of 8</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" id="calcBonusWrap">
+        <div class="row">
+          <div style="flex:1;">
+            <label>Your bonuses <small class="note">(instances only • 0–10 each)</small></label>
+            <select id="calcMy171"></select>
+            <select id="calcMy100"></select>
+            <select id="calcMyBull"></select>
+            <select id="calcMyDD"></select>
+          </div>
+          <div style="flex:1;">
+            <label>Opponent bonuses <small class="note">(instances only • 0–10 each)</small></label>
+            <select id="calcOpp171"></select>
+            <select id="calcOpp100"></select>
+            <select id="calcOppBull"></select>
+            <select id="calcOppDD"></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" id="calcAvgWrap">
+        <div class="row">
+          <div style="flex:1;">
+            <label>Your match avg (Must be filled in)</label>
+            <input id="calcMyAvg" type="number" min="0" step="0.1" placeholder="Your match avg" />
+          </div>
+          <div style="flex:1;">
+            <label>Opponent match avg (Must be filled in)</label>
+            <input id="calcOppAvg" type="number" min="0" step="0.1" placeholder="Opp match avg" />
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <button class="btn btn-primary" id="calcRunBtn" type="button" style="width:100%;">Calculate</button>
+        <div id="calcErr" style="color:var(--err);display:none;"></div>
+      </div>
+
+      <div class="section">
+        <div class="breakdown">
+          <div><strong>You total:</strong> <span id="calcYouTotal">0</span></div>
+          <div id="calcYouBreak" class="note" style="margin-top:6px;"></div>
+        </div>
+        <div class="breakdown">
+          <div><strong>Opponent total:</strong> <span id="calcOppTotal">0</span></div>
+          <div id="calcOppBreak" class="note" style="margin-top:6px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MY STATS MODAL -->
+  <div class="modal-overlay" id="statsModal">
+    <div class="modal">
+      <header>
+        <h3>My Stats</h3>
+        <button class="close" data-close="#statsModal">Close</button>
+      </header>
+
+      <!-- non-member preview -->
+      <div id="statsNonMemberUpsell" class="section">
+        <div class="breakdown">
+          <strong>Non-members</strong> see only confirmed/pending counts per format + leaderboard totals.
+          <div class="note" style="margin-top:6px;">Join to unlock graphs, rivals, achievements and match history tools.</div>
+        </div>
+
+        <div class="tbl-wrap" style="border:1px solid rgba(215,180,106,.18);border-radius:14px;">
+          <table style="min-width:520px;">
+            <thead>
+              <tr>
+                <th>Format</th>
+                <th>Confirmed</th>
+                <th>Pending</th>
+              </tr>
+            </thead>
+            <tbody id="statsCountsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- member summary -->
+      <div id="statsMemberSummary" class="section" style="display:none;">
+        <div class="breakdown">
+          <div><strong id="statsRank">Rank: —</strong></div>
+          <div class="note" id="statsGapSub" style="margin-top:6px;"></div>
+          <div style="margin-top:8px;font-weight:900;">
+            Points needed to catch next player: <span id="statsGapValue">—</span>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-k">FP points</div><div class="stat-v" id="statsPts">0</div></div>
+          <div class="stat-card"><div class="stat-k">Games</div><div class="stat-v" id="statsGames">0</div></div>
+          <div class="stat-card"><div class="stat-k">W/D/L</div><div class="stat-v" id="statsWDL">0/0/0</div></div>
+          <div class="stat-card"><div class="stat-k">Leg diff</div><div class="stat-v" id="statsLegDiff">0</div></div>
+          <div class="stat-card"><div class="stat-k">FP avg</div><div class="stat-v" id="statsAvg">-</div></div>
+          <div class="stat-card"><div class="stat-k">Status</div><div class="stat-v">Member</div></div>
+        </div>
+      </div>
+
+      <!-- member-only tabs -->
+      <div id="statsMemberOnly" style="display:none;">
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="tabGraphs">Graphs</button>
+          <button class="tab-btn" data-tab="tabRivals">Rivals</button>
+          <button class="tab-btn" data-tab="tabFormats">Formats</button>
+          <button class="tab-btn" data-tab="tabHistory">History</button>
+        </div>
+
+        <div id="tabGraphs" class="tab-panel active">
+          <div class="chart-box">
+            <div style="font-weight:900;margin-bottom:8px;">Cumulative points</div>
+            <div class="chart-wrap short"><canvas id="chartPoints"></canvas></div>
+          </div>
+          <div class="chart-box">
+            <div style="font-weight:900;margin-bottom:8px;">Match avg trend</div>
+            <div class="chart-wrap short"><canvas id="chartAvg"></canvas></div>
+          </div>
+        </div>
+
+        <div id="tabRivals" class="tab-panel">
+          <div class="breakdown">
+            <strong>Rivals</strong>
+            <div class="note">Most played / closest matchups.</div>
+          </div>
+          <div id="rivalsBox" class="section"></div>
+        </div>
+
+        <div id="tabFormats" class="tab-panel">
+          <div class="chart-box">
+            <div style="font-weight:900;margin-bottom:8px;">Format split</div>
+            <div class="chart-wrap tall"><canvas id="chartFormats"></canvas></div>
+          </div>
+          <div class="breakdown">
+            <strong>Format breakdown</strong>
+            <div class="note">Confirmed games by format + W/L.</div>
+            <div id="statsFormatRows" style="margin-top:8px;"></div>
+          </div>
+        </div>
+
+        <div id="tabHistory" class="tab-panel">
+          <div class="breakdown">
+            <strong>Recent confirmed games</strong>
+            <div class="note">Most recent first.</div>
+          </div>
+          <div id="statsHistory" class="section"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script type="module" src="/freeplay.js"></script>
+</body>
+</html>

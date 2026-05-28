@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>TrebleChasers ODL | Divisions</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      color: white;
+      background: radial-gradient(circle at top,#08275c 0%,#031126 45%,#010814 100%);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .site-header,
+    .hero-card,
+    .table-card,
+    .modal {
+      background: linear-gradient(145deg,rgba(4,26,59,.96),rgba(5,18,38,.96));
+      border: 1px solid rgba(245,201,106,.16);
+      border-radius: 28px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.5);
+    }
+
+    .site-header {
+      margin: 16px auto;
+      width: min(1450px,94%);
+      padding: 18px;
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: white;
+      text-decoration: none;
+    }
+
+    .brand img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+    }
+
+    .brand-text h1 {
+      margin: 0;
+      color: white;
+      font-size: 1.6rem;
+      line-height: 1;
+    }
+
+    .brand-text span,
+    p {
+      color: rgba(255,255,255,.72);
+    }
+
+    .header-actions {
+      margin-left: auto;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .page-wrap {
+      width: min(1450px,94%);
+      margin: 24px auto 80px;
+    }
+
+    .hero-card,
+    .table-card,
+    .modal {
+      padding: 24px;
+      margin-bottom: 22px;
+    }
+
+    .eyebrow,
+    .chip,
+    .table-header h3,
+    th {
+      color: #f5c96a;
+    }
+
+    .eyebrow {
+      font-weight: 900;
+      letter-spacing: .08em;
+      font-size: .78rem;
+    }
+
+    #divNameText {
+      font-size: 54px;
+      margin: 8px 0;
+      line-height: 1;
+    }
+
+    .hero-chips {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .chip {
+      display: inline-flex;
+      border: 1px solid rgba(245,201,106,.32);
+      background: rgba(245,201,106,.08);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-weight: 900;
+      font-size: .8rem;
+    }
+
+    .gold-btn,
+    .outline-btn {
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-weight: 800;
+      cursor: pointer;
+      border: 1px solid rgba(245,201,106,.26);
+      white-space: nowrap;
+    }
+
+    .gold-btn {
+      background: linear-gradient(180deg,#f5c96a,#d7a93d);
+      color: #06142b;
+    }
+
+    .outline-btn {
+      background: linear-gradient(180deg,rgba(24,58,108,.88),rgba(8,30,66,.96));
+      color: white;
+    }
+
+    select,
+    input {
+      background: #031126;
+      color: white;
+      border: 1px solid rgba(245,201,106,.22);
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+    .activity-box {
+      background: linear-gradient(145deg,rgba(4,26,59,.96),rgba(5,18,38,.96));
+      border: 1px solid rgba(245,201,106,.16);
+      border-radius: 22px;
+      padding: 18px;
+      margin-bottom: 22px;
+    }
+
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .table-header h3 {
+      margin: 0;
+      font-size: 1.7rem;
+    }
+
+    .error-box {
+      color: #ff7474;
+      margin-bottom: 12px;
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+      border-radius: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1000px;
+    }
+
+    th,
+    td {
+      padding: 14px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    tr:hover td {
+      background: rgba(255,255,255,.035);
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.65);
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 100;
+    }
+
+    .modal-overlay.open,
+    .modal-overlay.is-open {
+      display: flex;
+    }
+
+    .modal {
+      width: min(900px,96vw);
+      max-height: 90vh;
+      overflow: auto;
+    }
+
+    .large-modal {
+      width: min(1050px,96vw);
+    }
+
+    .close {
+      float: right;
+      border-radius: 999px;
+      border: 1px solid rgba(245,201,106,.26);
+      background: #031126;
+      color: white;
+      width: 34px;
+      height: 34px;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    .modal-meta {
+      color: rgba(255,255,255,.72);
+      margin-bottom: 14px;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2,1fr);
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3,1fr);
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label,
+    h4 {
+      color: #f5c96a;
+    }
+
+    .status.err {
+      color: #ff7474;
+      margin: 10px 0;
+    }
+
+    #inboxCount {
+      display: inline-flex;
+      min-width: 22px;
+      height: 22px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      margin-left: 6px;
+      background: #06142b;
+      color: #f5c96a;
+      font-size: .75rem;
+    }
+
+    @media(max-width:900px) {
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .header-actions {
+        margin-left: 0;
+        width: 100%;
+      }
+
+      .header-actions > * {
+        flex: 1 1 auto;
+      }
+
+      #divNameText {
+        font-size: 42px;
+      }
+    }
+  </style>
+
+  <script type="module" src="./Js/division.js"></script>
+</head>
+
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+
+    <a href="./index.html" class="brand">
+      <img
+        src="./Assets/TrebleAssets/TrebleAssets_file_00000000564c72469e778dedad6ed082.png"
+        alt="TrebleChasers ODL"
+      />
+
+      <div class="brand-text">
+        <h1>TrebleChasers ODL</h1>
+        <span>Division Standings</span>
+      </div>
+    </a>
+
+    <div class="header-actions">
+
+      <button
+        class="outline-btn"
+        onclick="window.location.href='./index.html'"
+      >
+        Home
+      </button>
+
+      <select id="divisionSelectPublic"></select>
+
+      <button id="btnFixtures" class="gold-btn">
+        Fixtures
+      </button>
+
+      <button id="btnSubmit" class="gold-btn">
+        Submit Result
+      </button>
+
+      <button id="btnInbox" class="gold-btn">
+        Inbox
+        <span id="inboxCount">0</span>
+      </button>
+
+      <button
+        onclick="window.location.href='./player-profile.html'"
+        class="gold-btn"
+      >
+        Player Profiles
+      </button>
+
+      <button id="btnPointsCalc" class="outline-btn">
+        Points Calculator
+      </button>
+
+    </div>
+
+  </div>
+</header>
+
+<main class="page-wrap">
+
+  <section class="hero-card">
+    <div class="hero-left">
+      <span class="eyebrow">
+        TREBLECHASERS ONLINE DARTS LEAGUE
+      </span>
+
+      <h2 id="divNameText">
+        Division 1
+      </h2>
+
+      <p>
+        Live division standings, fixtures, pending results,
+        averages, bonuses, and rankings.
+      </p>
+
+      <div class="hero-chips">
+        <div class="chip" id="seasonChip">
+          CURRENT SEASON
+        </div>
+
+        <div class="chip" id="matchesReqChip">
+          Best of 7
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section
+    id="activityCheckpointBox"
+    class="activity-box"
+    style="display:none;"
+  >
+    <div>
+      <strong>Activity Checkpoint</strong>
+      <p id="activityCheckpointText"></p>
+    </div>
+
+    <div id="activityCheckpointCount"></div>
+  </section>
+
+  <section class="table-card">
+
+    <div class="table-header">
+      <h3>Standings</h3>
+
+      <div id="updatedMeta"></div>
+    </div>
+
+    <div id="errorMeta" class="error-box"></div>
+
+    <div class="table-scroll">
+
+      <table class="standings-table">
+
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Player</th>
+            <th>P</th>
+            <th>W</th>
+            <th>L</th>
+            <th>LF</th>
+            <th>LA</th>
+            <th>Diff</th>
+            <th>171+</th>
+            <th>100+ CO</th>
+            <th>Big Fish</th>
+            <th>Bulls</th>
+            <th>D-D</th>
+            <th>Avg</th>
+            <th>ELO</th>
+          </tr>
+        </thead>
+
+        <tbody id="standingsBody"></tbody>
+
+      </table>
+
+    </div>
+  </section>
+
+  <div id="fixturesModal" class="modal-overlay">
+
+    <div class="modal">
+
+      <button class="close">×</button>
+
+      <h3>My Fixtures</h3>
+
+      <div class="modal-meta">
+        Played:
+        <span id="fixturesCount">0 / 0</span>
+      </div>
+
+      <div id="fixturesList"></div>
+
+    </div>
+  </div>
+
+  <div id="submitModal" class="modal-overlay">
+
+    <div class="modal large-modal">
+
+      <button class="close">×</button>
+
+      <h3>Submit Match Result</h3>
+
+      <div class="grid-2">
+
+        <div class="field">
+          <label>Opponent</label>
+          <select id="srOpponent"></select>
+        </div>
+
+        <div class="field">
+          <label>Your Legs</label>
+          <input id="srMyLegs" type="number" />
+        </div>
+
+        <div class="field">
+          <label>Opponent Legs</label>
+          <input id="srOppLegs" type="number" />
+        </div>
+
+      </div>
+
+      <h4>Your Stats</h4>
+
+      <div class="grid-3">
+
+        <input id="srMy171" type="number" placeholder="171+" />
+        <input id="srMy100" type="number" placeholder="100+ CO" />
+        <input id="srMyBigFish" type="number" placeholder="Big Fish 170" />
+        <input id="srMyBull" type="number" placeholder="Bull Finishes" />
+        <input id="srMyDD" type="number" placeholder="Double Double" />
+        <input id="srMyAvg" type="number" step="0.01" placeholder="Average" />
+
+      </div>
+
+      <h4>Opponent Stats</h4>
+
+      <div class="grid-3">
+
+        <input id="srOpp171" type="number" placeholder="171+" />
+        <input id="srOpp100" type="number" placeholder="100+ CO" />
+        <input id="srOppBigFish" type="number" placeholder="Big Fish 170" />
+        <input id="srOppBull" type="number" placeholder="Bull Finishes" />
+        <input id="srOppDD" type="number" placeholder="Double Double" />
+        <input id="srOppAvg" type="number" step="0.01" placeholder="Average" />
+
+      </div>
+
+      <div id="srNote" class="status err"></div>
+
+      <button id="srSubmitBtn" class="gold-btn">
+        Submit Match
+      </button>
+
+    </div>
+  </div>
+
+</main>
+
+</body>
+</html>
